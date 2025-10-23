@@ -838,7 +838,7 @@
         <div class="total-period">per year</div>
       </div>
       
-      <button class="cta-button">Get Started with Sweet Security</button>
+      <button class="cta-button" onclick="redirectToDemo()">Get Started with Sweet Security</button>
       
       <div class="assumptions">
         <strong>Key Assumptions:</strong><br>
@@ -948,7 +948,7 @@
       const breakdownDiv = document.getElementById('consolidationBreakdown');
       breakdownDiv.classList.add('calculating');
       
-      // Delay calculation for suspense
+      // Delay calculation for suspense (0.8 seconds)
       setTimeout(() => {
         let currentToolsCost = 0;
         
@@ -985,14 +985,16 @@
         
         // Update sidebar with delay
         updateSidebar();
-      }, 200);
+      }, 800);
     }
     
     function openPreciseEstimate() {
-      // Trigger the same action as "Get Started with Sweet Security"
-      // You can replace this with your actual CTA action (e.g., open a form, redirect, etc.)
-      alert('Contact our sales team for a precise ROI estimation tailored to your organization.');
-      // Or redirect: window.location.href = 'https://your-contact-form-url.com';
+      redirectToDemo();
+    }
+    
+    function redirectToDemo() {
+      alert('Redirect to book a demo page will be here');
+      // Future: window.location.href = 'https://your-demo-booking-url.com';
     }
     
     function toggleAdditionalDetails() {
@@ -1010,7 +1012,7 @@
       
       if (workloads === 0) return;
       
-      // Delay calculation for suspense
+      // Delay calculation for suspense (0.8 seconds)
       setTimeout(() => {
         // Calculate annual incidents from monthly
         const annualIncidents = monthlyIncidentsValue * 12;
@@ -1036,7 +1038,7 @@
             mttrItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }, 300);
-      }, 200);
+      }, 800);
     }
     
     function updateSidebar() {
