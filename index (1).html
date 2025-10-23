@@ -229,9 +229,8 @@
     .estimated-value {
       font-size: 48px;
       font-weight: 900;
-      color: var(--sweet-neon);
+      color: var(--ink);
       margin: 24px 0;
-      text-shadow: 0 0 20px rgba(194, 255, 0, 0.2);
     }
     
     .precision-cta {
@@ -274,8 +273,28 @@
     
     .breakdown-title {
       font-weight: 700;
+      font-size: 18px;
+      line-height: 1.5;
       margin-bottom: 12px;
       color: var(--ink);
+    }
+    
+    .breakdown-title.animate-once {
+      animation: popIn 0.6s ease-out;
+    }
+    
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
     
     .breakdown-row {
@@ -573,7 +592,7 @@
         <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Estimated Savings</button>
         
         <div class="calculation-breakdown" id="consolidationBreakdown">
-          <div class="breakdown-title">Estimated Annual Savings</div>
+          <div class="breakdown-title" id="consolidationTitle">Drawing from the real savings our customers have realized after consolidating their security tools with Sweet, here's what we believe you could save annually:</div>
           <div class="estimated-value" id="consolidationEstimate">$0</div>
           <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
         </div>
@@ -673,6 +692,9 @@
     // Track if user has manually changed monthly incidents
     let userOverrodeIncidents = false;
     
+    // Track if consolidation breakdown has been shown before
+    let consolidationShownBefore = false;
+    
     // Function to update monthly incidents based on workloads
     function updateMonthlyIncidents() {
       if (!userOverrodeIncidents) {
@@ -768,6 +790,13 @@
         estimateEl.classList.add('animating');
         estimateEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
         setTimeout(() => estimateEl.classList.remove('animating'), 400);
+        
+        // Add pop-in animation to title only on first show
+        if (!consolidationShownBefore) {
+          const titleEl = document.getElementById('consolidationTitle');
+          titleEl.classList.add('animate-once');
+          consolidationShownBefore = true;
+        }
         
         breakdownDiv.classList.remove('calculating');
         breakdownDiv.classList.add('show');
