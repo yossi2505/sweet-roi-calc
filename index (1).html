@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweet ROI Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sweet-neon: #c2ff00;
+      --ink: #111;
+      --muted: #666;
+      --light-bg: #f8f8f8;
+      --border: #e0e0e0;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0; 
+      background: #fff; 
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background: linear-gradient(135deg, #fff9e6, #e7ffcf);
+    }
+    
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      margin: 0 0 16px;
+      color: var(--ink);
+    }
+    
+    .hero p {
+      font-size: 20px;
+      color: var(--muted);
+      margin: 0 0 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+    
+    .calculator-sections {
+      flex: 2;
+    }
+    
+    .section {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      padding: 40px;
+      margin-bottom: 32px;
+      margin-top: -20px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .section:first-child {
+      margin-top: -40px;
+    }
+    
+    .section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      margin: 0 0 16px;
+      color: var(--ink);
+    }
+    
+    .section p {
+      color: var(--muted);
+      margin: 0 0 24px;
+      font-size: 16px;
+    }
+    
+    .input-group {
+      margin-bottom: 24px;
+    }
+    
+    .input-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+    
+    .input {
+      width: 100%;
+      max-width: 200px;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      background: white;
+      transition: all 0.2s;
+    }
+    
+    .input:focus {
+      outline: none;
+      border-color: var(--sweet-neon);
+      box-shadow: 0 0 0 3px rgba(194, 255, 0, 0.1);
+    }
+    
+    .input:read-only {
+      background: #f5f5f5;
+      color: var(--muted);
+    }
+    
+    /* Gray background for workload inputs */
+    #workloadsFindings, #workloadsMTTR, #monthlyIncidents {
+      background: #f5f5f5;
+      color: var(--ink);
+    }
+    
+    #workloadsFindings:focus, #workloadsMTTR:focus, #monthlyIncidents:focus {
+      background: #f0f0f0;
+    }
+    
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .tool-card {
+      background: var(--light-bg);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .tool-card:hover {
+      border-color: var(--sweet-neon);
+      transform: translateY(-2px);
+    }
+    
+    .tool-card.selected {
+      border-color: var(--sweet-neon);
+      background: #f0fff0;
+    }
+    
+    .tool-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      color: var(--sweet-neon);
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .tool-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+    
+    .tool-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    
+    .tool-price {
+      font-weight: 700;
+      color: var(--ink);
+      font-size: 16px;
+    }
+    
+    .calculate-btn {
+      background: var(--sweet-neon);
+      color: var(--ink);
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 16px;
+    }
+    
+    .calculate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(194, 255, 0, 0.3);
+    }
+    
+    .calculate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .calculation-breakdown {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      border-left: 4px solid var(--sweet-neon);
+      display: none;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .calculation-breakdown.show {
+      display: block;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes countUp {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    .animating {
+      animation: countUp 0.4s ease-out;
+    }
+    
+    .calculating {
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+    
+    .breakdown-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+    
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .breakdown-label {
+      color: var(--muted);
+    }
+    
+    .breakdown-value {
+      font-weight: 600;
+      color: var(--ink);
+    }
+    
+    .breakdown-total {
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      margin-top: 8px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    .breakdown-total .breakdown-value {
+      color: var(--sweet-neon);
+      font-size: 18px;
+    }
+    
+    /* Sidebar Checkout Style */
+    .sidebar {
+      flex: 1;
+      background: var(--ink);
+      color: white;
+      border-radius: 20px;
+      padding: 32px;
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+      min-width: 350px;
+    }
+    
+    .sidebar h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      margin: 0 0 24px;
+      color: white;
+    }
+    
+    .bill-items {
+      margin-bottom: 24px;
+    }
+    
+    .bill-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 20px 0;
+      border-bottom: 1px solid #333;
+    }
+    
+    .bill-item:last-child {
+      border-bottom: none;
+    }
+    
+    .bill-item-left {
+      flex: 1;
+    }
+    
+    .bill-item-name {
+      color: var(--sweet-neon);
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    
+    .bill-item-desc {
+      color: #ccc;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    
+    .bill-calculation {
+      font-size: 13px;
+      color: #ccc;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #2a2a2a;
+      line-height: 1.8;
+    }
+    
+    .bill-calc-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    
+    .bill-calc-label {
+      color: #aaa;
+      font-size: 13px;
+    }
+    
+    .bill-calc-value {
+      color: var(--sweet-neon);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .bill-calc-formula {
+      color: #888;
+      font-style: italic;
+      font-size: 12px;
+      margin-top: 6px;
+      text-align: center;
+    }
+    
+    .bill-item-value {
+      font-weight: 900;
+      font-size: 24px;
+      color: var(--sweet-neon);
+      white-space: nowrap;
+      margin-left: 16px;
+      text-shadow: 0 0 20px rgba(194, 255, 0, 0.3);
+    }
+    
+    .bill-total {
+      border-top: 2px solid var(--sweet-neon);
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+    
+    .total-label {
+      font-size: 20px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .total-value {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--sweet-neon);
+      margin-top: 8px;
+    }
+    
+    .total-period {
+      color: #ccc;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    
+    .cta-button {
+      width: 100%;
+      background: var(--sweet-neon);
+      color: var(--ink);
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 24px;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(194, 255, 0, 0.3);
+    }
+    
+    .assumptions {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+      font-size: 12px;
+      color: #999;
+      line-height: 1.4;
+    }
+    
+    .findings-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .benchmark-list {
+      background: #f9f9f9;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .benchmark-list h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    
+    .benchmark-list ul {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .benchmark-list li {
+      margin-bottom: 4px;
+    }
+    
+    @media (max-width: 1200px) {
+      .container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        position: relative;
+        top: 0;
+        min-width: auto;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 36px; }
+      .hero p { font-size: 18px; }
+      .section { padding: 24px; }
+      .tools-grid { grid-template-columns: 1fr; }
+      .findings-inputs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1><b>ROI Calculator</b></h1>
+    <p>Discover the market value of security tools you could consolidate and the potential savings from reducing alert fatigue</p>
+  </div>
+  
+  <div class="container">
+    <div class="calculator-sections">
+      <!-- Section 1: Tool Consolidation -->
+      <div class="section">
+        <h2>Tool Consolidation Value</h2>
+        <p>Calculate the total market value of security tools that could be consolidated into a unified platform.</p>
+        
+        <div class="input-group">
+          <label class="input-label">Number of workloads in your organization</label>
+          <input type="number" id="workloads" class="input" placeholder="800" min="1" value="800">
+        </div>
+        
+        <label class="input-label">Select the security tools you currently use:</label>
+        <div class="tools-grid" id="toolsGrid">
+          <div class="tool-card" data-tool="Runtime Security" data-price="150">
+            <div class="tool-name">Runtime Security</div>
+            <div class="tool-desc">CWPP & Real-Time Monitoring</div>
+            <div class="tool-price">~$150/workload/year</div>
+          </div>
+          
+          <div class="tool-card" data-tool="CSPM" data-price="100">
+            <div class="tool-name">Cloud Security Posture</div>
+            <div class="tool-desc">CSPM & Configuration Management</div>
+            <div class="tool-price">~$100/workload/year</div>
+          </div>
+          
+          <div class="tool-card" data-tool="CIEM" data-price="80">
+            <div class="tool-name">Identity Management</div>
+            <div class="tool-desc">CIEM & Identity Protection</div>
+            <div class="tool-price">~$80/workload/year</div>
+          </div>
+          
+          <div class="tool-card" data-tool="DSPM" data-price="120">
+            <div class="tool-name">Data Security</div>
+            <div class="tool-desc">DSPM & Data Protection</div>
+            <div class="tool-price">~$120/workload/year</div>
+          </div>
+          
+          <div class="tool-card" data-tool="API" data-price="110">
+            <div class="tool-name">API Security</div>
+            <div class="tool-desc">API Discovery & Protection</div>
+            <div class="tool-price">~$110/workload/year</div>
+          </div>
+          
+          <div class="tool-card" data-tool="VM" data-price="90">
+            <div class="tool-name">Vulnerability Management</div>
+            <div class="tool-desc">VM & Prioritization</div>
+            <div class="tool-price">~$90/workload/year</div>
+          </div>
+          
+          <div class="tool-card" data-tool="CDR" data-price="130">
+            <div class="tool-name">Detection & Response</div>
+            <div class="tool-desc">CDR & SIEM Integration</div>
+            <div class="tool-price">~$130/workload/year</div>
+          </div>
+          
+          <div class="tool-card" data-tool="AI" data-price="140">
+            <div class="tool-name">AI/ML Security</div>
+            <div class="tool-desc">Model & Pipeline Protection</div>
+            <div class="tool-price">~$140/workload/year</div>
+          </div>
+        </div>
+        
+        <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Market Value Replaced</button>
+        
+        <div class="calculation-breakdown" id="consolidationBreakdown">
+          <div class="breakdown-title">Calculation Breakdown:</div>
+          <div id="consolidationDetails"></div>
+        </div>
+      </div>
+      
+      <!-- Section 2: Findings-Centric Savings -->
+      <div class="section">
+        <h2>Alert Reduction Savings</h2>
+        <p>Calculate analyst time saved by Sweet's AI reducing security alerts by 95%.</p>
+        
+        <div class="findings-inputs">
+          <div class="input-group">
+            <label class="input-label">Workloads</label>
+            <input type="number" id="workloadsFindings" class="input" value="800" min="1">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Analyst hourly rate ($)</label>
+            <input type="number" id="hourlyRate" class="input" value="35" min="0">
+          </div>
+        </div>
+        
+        <div class="benchmark-list">
+          <h4> Values used as the basis for the calculation </h4>
+          <ul>
+            <li><strong>1,800</strong> Average security findings per workload per month for our customers. </li>
+            <li><strong>3 minutes</strong> average review time per finding</li>
+            <li><strong>28%</strong> of findings are high/critical priority</li>
+            <li><strong>95%</strong> reduction with Sweet's AI correlation</li>
+          </ul>
+        </div>
+        
+        <button class="calculate-btn" id="findingsBtn" onclick="calculateFindingsSavings()">Calculate Alert Reduction Savings</button>
+        
+        <div class="calculation-breakdown" id="findingsBreakdown">
+          <div class="breakdown-title">Calculation Breakdown:</div>
+          <div id="findingsDetails"></div>
+        </div>
+      </div>
+      
+      <!-- Section 3: MTTR Reduction Value -->
+      <div class="section">
+        <h2>MTTR Reduction Value Calculator</h2>
+        <p>Calculate analyst time saved by reducing Mean Time To Resolve (MTTR) from industry average to Sweet's optimized response time.</p>
+        
+        <div class="findings-inputs">
+          <div class="input-group">
+            <label class="input-label">Workloads</label>
+            <input type="number" id="workloadsMTTR" class="input" value="800" min="1">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Monthly security incidents</label>
+            <input type="number" id="monthlyIncidents" class="input" value="4000" min="1">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Analyst hourly rate ($)</label>
+            <input type="number" id="hourlyRateMTTR" class="input" value="35" min="0">
+          </div>
+        </div>
+        
+        <div class="benchmark-list">
+          <h4>Values used as the basis for the calculation</h4>
+          <ul>
+            <li><strong>Auto-calculated:</strong> Monthly incidents = Workloads × 5 incidents/workload/month (you can change this)</li>
+            <li><strong>Industry benchmark MTTR:</strong> 3 hours to resolve an incident</li>
+            <li><strong>Sweet's MTTR:</strong> 5 minutes with platform automation</li>
+          </ul>
+        </div>
+        
+        <button class="calculate-btn" id="mttrBtn" onclick="calculateMTTRSavings()">Calculate MTTR Reduction Value</button>
+      </div>
+    </div>
+    
+    <!-- Sidebar Checkout -->
+    <div class="sidebar">
+      <h3>Your ROI Summary</h3>
+      
+      <div class="bill-items" id="billItems">
+        <div class="bill-item" id="consolidationItem" style="display: none;">
+          <div class="bill-item-left">
+            <div class="bill-item-name">Market Value Replaced</div>
+            <div class="bill-item-desc" id="consolidationDesc">Select tools to calculate</div>
+            <div class="bill-calculation" id="consolidationCalc"></div>
+          </div>
+          <div class="bill-item-value" id="consolidationValue">$0</div>
+        </div>
+        
+        <div class="bill-item" id="findingsItem" style="display: none;">
+          <div class="bill-item-left">
+            <div class="bill-item-name">Alert Reduction</div>
+            <div class="bill-item-desc" id="findingsDesc">95% fewer alerts to review</div>
+            <div class="bill-calculation" id="findingsCalc"></div>
+          </div>
+          <div class="bill-item-value" id="findingsValue">$0</div>
+        </div>
+        
+        <div class="bill-item" id="mttrItem" style="display: none;">
+          <div class="bill-item-left">
+            <div class="bill-item-name">MTTR Reduction</div>
+            <div class="bill-item-desc" id="mttrDesc">Faster incident resolution</div>
+            <div class="bill-calculation" id="mttrCalc"></div>
+          </div>
+          <div class="bill-item-value" id="mttrValue">$0</div>
+        </div>
+      </div>
+      
+      <div class="bill-total">
+        <div class="total-label">Total Annual Value</div>
+        <div class="total-value" id="totalSavings">$0</div>
+        <div class="total-period">per year</div>
+      </div>
+      
+      <button class="cta-button">Get Started with Sweet Security</button>
+      
+      <div class="assumptions">
+        <strong>Key Assumptions:</strong><br>
+        • Market prices based on public vendor benchmarks<br>
+        • Benchmarks represent average annual costs per workload<br>
+        • Analyst time calculated using your hourly rate<br>
+        • Industry data from security research reports
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FINDINGS_PER_WORKLOAD_MONTH = 1800;
+    const MINUTES_PER_FINDING = 3;
+    const HIGH_CRITICAL_RATIO = 0.28;
+    const SWEET_REDUCTION_RATIO = 0.95; // 95% reduction
+    
+    // MTTR Constants
+    const INCIDENTS_PER_WORKLOAD_YEAR = 12;
+    const INCIDENTS_PER_WORKLOAD_MONTH = 5; // Average incidents per workload per month
+    const BENCHMARK_MTTR_HOURS = 3;
+    const SWEET_MTTR_MINUTES = 5;
+    const SWEET_MTTR_HOURS = SWEET_MTTR_MINUTES / 60; // 0.0833 hours
+    
+    let selectedTools = new Set();
+    let marketValueReplaced = 0;
+    let findingsSavings = 0;
+    let mttrSavings = 0;
+    
+    // Sync workloads between sections
+    const workloadsInput = document.getElementById('workloads');
+    const workloadsFindings = document.getElementById('workloadsFindings');
+    const workloadsMTTR = document.getElementById('workloadsMTTR');
+    const monthlyIncidents = document.getElementById('monthlyIncidents');
+    
+    // Track if user has manually changed monthly incidents
+    let userOverrodeIncidents = false;
+    
+    // Function to update monthly incidents based on workloads
+    function updateMonthlyIncidents() {
+      if (!userOverrodeIncidents) {
+        const workloads = parseInt(workloadsMTTR.value) || 0;
+        monthlyIncidents.value = workloads * INCIDENTS_PER_WORKLOAD_MONTH;
+      }
+    }
+    
+    // Function to sync all workload fields
+    function syncWorkloads(sourceValue) {
+      workloadsInput.value = sourceValue;
+      workloadsFindings.value = sourceValue;
+      workloadsMTTR.value = sourceValue;
+      updateMonthlyIncidents();
+      updateConsolidationButton();
+    }
+    
+    workloadsInput.addEventListener('input', () => {
+      syncWorkloads(workloadsInput.value);
+    });
+    
+    workloadsFindings.addEventListener('input', () => {
+      syncWorkloads(workloadsFindings.value);
+    });
+    
+    workloadsMTTR.addEventListener('input', () => {
+      syncWorkloads(workloadsMTTR.value);
+    });
+    
+    // Track manual changes to monthly incidents
+    monthlyIncidents.addEventListener('input', () => {
+      userOverrodeIncidents = true;
+    });
+    
+    // Reset override flag when monthly incidents is cleared
+    monthlyIncidents.addEventListener('focus', function() {
+      if (this.value === '') {
+        userOverrodeIncidents = false;
+        updateMonthlyIncidents();
+      }
+    });
+    
+    // Tool selection handling
+    document.querySelectorAll('.tool-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const tool = this.dataset.tool;
+        
+        if (selectedTools.has(tool)) {
+          selectedTools.delete(tool);
+          this.classList.remove('selected');
+        } else {
+          selectedTools.add(tool);
+          this.classList.add('selected');
+        }
+        
+        updateConsolidationButton();
+      });
+    });
+    
+    function updateConsolidationButton() {
+      const btn = document.getElementById('consolidationBtn');
+      const workloads = parseInt(workloadsInput.value) || 0;
+      
+      if (selectedTools.size > 0 && workloads > 0) {
+        btn.disabled = false;
+        btn.textContent = `Calculate Market Value Replaced (${selectedTools.size} tools)`;
+      } else {
+        btn.disabled = true;
+        btn.textContent = 'Select tools and enter workloads';
+      }
+    }
+    
+    function calculateConsolidation() {
+      const workloads = parseInt(workloadsInput.value) || 0;
+      
+      if (selectedTools.size === 0 || workloads === 0) return;
+      
+      // Add calculating state
+      const breakdownDiv = document.getElementById('consolidationBreakdown');
+      breakdownDiv.classList.add('calculating');
+      
+      // Delay calculation for suspense
+      setTimeout(() => {
+        let currentToolsCost = 0;
+        let breakdownHTML = '';
+        
+        selectedTools.forEach(tool => {
+          const card = document.querySelector(`[data-tool="${tool}"]`);
+          const price = parseInt(card.dataset.price);
+          const toolCost = price * workloads;
+          currentToolsCost += toolCost;
+          
+          breakdownHTML += `
+            <div class="breakdown-row">
+              <span class="breakdown-label">${tool}</span>
+              <span class="breakdown-value">$${toolCost.toLocaleString()}</span>
+            </div>
+          `;
+        });
+        
+        marketValueReplaced = currentToolsCost;
+        
+        breakdownHTML += `
+          <div class="breakdown-row breakdown-total">
+            <span class="breakdown-label">Estimated market value replaced</span>
+            <span class="breakdown-value">$${marketValueReplaced.toLocaleString()}</span>
+          </div>
+        `;
+        
+        document.getElementById('consolidationDetails').innerHTML = breakdownHTML;
+        breakdownDiv.classList.remove('calculating');
+        breakdownDiv.classList.add('show');
+        
+        // Update sidebar with delay
+        updateSidebar();
+      }, 200);
+    }
+    
+    function calculateFindingsSavings() {
+      const workloads = parseInt(workloadsFindings.value) || 0;
+      const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 35;
+      
+      if (workloads === 0) return;
+      
+      // Add calculating state
+      const breakdownDiv = document.getElementById('findingsBreakdown');
+      breakdownDiv.classList.add('calculating');
+      
+      // Delay calculation for suspense
+      setTimeout(() => {
+        // Calculate findings
+        const monthlyFindings = workloads * FINDINGS_PER_WORKLOAD_MONTH;
+        const annualFindings = monthlyFindings * 12;
+        const highCriticalFindings = annualFindings * HIGH_CRITICAL_RATIO;
+        
+        // Calculate current analyst cost (only for high/critical findings)
+        const currentAnalystMinutes = highCriticalFindings * MINUTES_PER_FINDING;
+        const currentAnalystHours = currentAnalystMinutes / 60;
+        const currentCost = currentAnalystHours * hourlyRate;
+        
+        // Calculate Sweet cost (5% of findings remain after 95% reduction)
+        const remainingFindings = highCriticalFindings * (1 - SWEET_REDUCTION_RATIO);
+        const sweetAnalystMinutes = remainingFindings * MINUTES_PER_FINDING;
+        const sweetAnalystHours = sweetAnalystMinutes / 60;
+        const sweetCost = sweetAnalystHours * hourlyRate;
+        
+        // Calculate savings
+        findingsSavings = currentCost - sweetCost;
+        
+        const breakdownHTML = `
+          <div class="breakdown-row">
+            <span class="breakdown-label">High/Critical alerts to review</span>
+            <span class="breakdown-value">${Math.round(highCriticalFindings).toLocaleString()}</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Alert reduction (95%)</span>
+            <span class="breakdown-value">${Math.round(highCriticalFindings * 0.95).toLocaleString()} fewer alerts</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Hours saved</span>
+            <span class="breakdown-value">${Math.round(currentAnalystHours - sweetAnalystHours).toLocaleString()} hrs</span>
+          </div>
+          <div class="breakdown-row breakdown-total">
+            <span class="breakdown-label">Annual savings</span>
+            <span class="breakdown-value">$${Math.round(findingsSavings).toLocaleString()}</span>
+          </div>
+        `;
+        
+        document.getElementById('findingsDetails').innerHTML = breakdownHTML;
+        breakdownDiv.classList.remove('calculating');
+        breakdownDiv.classList.add('show');
+        
+        // Update sidebar
+        updateSidebar();
+      }, 200);
+    }
+    
+    function calculateMTTRSavings() {
+      const workloads = parseInt(workloadsMTTR.value) || 0;
+      const hourlyRate = parseFloat(document.getElementById('hourlyRateMTTR').value) || 35;
+      const monthlyIncidentsValue = parseInt(monthlyIncidents.value) || 0;
+      
+      if (workloads === 0) return;
+      
+      // Delay calculation for suspense
+      setTimeout(() => {
+        // Calculate annual incidents from monthly
+        const annualIncidents = monthlyIncidentsValue * 12;
+        
+        // Calculate current time spent (benchmark MTTR)
+        const currentTotalHours = annualIncidents * BENCHMARK_MTTR_HOURS;
+        const currentCost = currentTotalHours * hourlyRate;
+        
+        // Calculate Sweet time spent (optimized MTTR)
+        const sweetTotalHours = annualIncidents * SWEET_MTTR_HOURS;
+        const sweetCost = sweetTotalHours * hourlyRate;
+        
+        // Calculate savings
+        mttrSavings = currentCost - sweetCost;
+        
+        // Update sidebar
+        updateSidebar();
+      }, 200);
+    }
+    
+    function updateSidebar() {
+      // Update consolidation item
+      if (marketValueReplaced > 0) {
+        document.getElementById('consolidationItem').style.display = 'flex';
+        const consolidationValueEl = document.getElementById('consolidationValue');
+        consolidationValueEl.classList.add('animating');
+        consolidationValueEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
+        setTimeout(() => consolidationValueEl.classList.remove('animating'), 400);
+        document.getElementById('consolidationDesc').textContent = `${selectedTools.size} tools consolidated`;
+        
+        // Add calculation breakdown
+        const workloads = parseInt(workloadsInput.value) || 0;
+        let toolBreakdown = '';
+        let toolCount = 0;
+        selectedTools.forEach(tool => {
+          const card = document.querySelector(`[data-tool="${tool}"]`);
+          const price = parseInt(card.dataset.price);
+          toolCount++;
+          if (toolCount <= 3) {
+            toolBreakdown += `
+              <div class="bill-calc-row">
+                <span class="bill-calc-label">${tool}:</span>
+                <span class="bill-calc-value">$${price} × ${workloads}</span>
+              </div>
+            `;
+          }
+        });
+        
+        if (selectedTools.size > 3) {
+          toolBreakdown += `
+            <div class="bill-calc-row">
+              <span class="bill-calc-label">+${selectedTools.size - 3} more...</span>
+              <span class="bill-calc-value"></span>
+            </div>
+          `;
+        }
+        
+        document.getElementById('consolidationCalc').innerHTML = `
+          ${toolBreakdown}
+          <div class="bill-calc-formula">Sum of ${selectedTools.size} tool costs</div>
+        `;
+      } else {
+        document.getElementById('consolidationItem').style.display = 'none';
+      }
+      
+      // Update findings item
+      if (findingsSavings > 0) {
+        document.getElementById('findingsItem').style.display = 'flex';
+        const findingsValueEl = document.getElementById('findingsValue');
+        findingsValueEl.classList.add('animating');
+        findingsValueEl.textContent = `$${Math.round(findingsSavings).toLocaleString()}`;
+        setTimeout(() => findingsValueEl.classList.remove('animating'), 400);
+        const workloads = parseInt(workloadsFindings.value) || 0;
+        document.getElementById('findingsDesc').textContent = `${workloads} workloads, 90% alert reduction`;
+        
+        // Add calculation breakdown
+        const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 35;
+        const monthlyFindings = workloads * FINDINGS_PER_WORKLOAD_MONTH;
+        const annualFindings = monthlyFindings * 12;
+        const highCriticalFindings = Math.round(annualFindings * HIGH_CRITICAL_RATIO);
+        const currentHours = Math.round((highCriticalFindings * MINUTES_PER_FINDING) / 60);
+        const currentCost = Math.round(currentHours * hourlyRate);
+        const sweetHours = Math.round(currentHours * 0.05);
+        const sweetCost = Math.round(sweetHours * hourlyRate);
+        
+        document.getElementById('findingsCalc').innerHTML = `
+          <div class="bill-calc-row">
+            <span class="bill-calc-label">Alerts reduced:</span>
+            <span class="bill-calc-value">95%</span>
+          </div>
+          <div class="bill-calc-row">
+            <span class="bill-calc-label">Hours saved:</span>
+            <span class="bill-calc-value">${(currentHours - sweetHours).toLocaleString()} hrs</span>
+          </div>
+          <div class="bill-calc-formula">@ $${hourlyRate}/hour</div>
+        `;
+      } else {
+        document.getElementById('findingsItem').style.display = 'none';
+      }
+      
+      // Update MTTR item
+      if (mttrSavings > 0) {
+        document.getElementById('mttrItem').style.display = 'flex';
+        const mttrValueEl = document.getElementById('mttrValue');
+        mttrValueEl.classList.add('animating');
+        mttrValueEl.textContent = `$${Math.round(mttrSavings).toLocaleString()}`;
+        setTimeout(() => mttrValueEl.classList.remove('animating'), 400);
+        
+        const workloads = parseInt(workloadsMTTR.value) || 0;
+        const hourlyRate = parseFloat(document.getElementById('hourlyRateMTTR').value) || 35;
+        const monthlyIncidentsValue = parseInt(monthlyIncidents.value) || 0;
+        
+        const annualIncidents = monthlyIncidentsValue * 12;
+        const currentHours = Math.round(annualIncidents * BENCHMARK_MTTR_HOURS);
+        const sweetHours = Math.round(annualIncidents * SWEET_MTTR_HOURS);
+        const hoursSaved = currentHours - sweetHours;
+        
+        document.getElementById('mttrDesc').textContent = `${hoursSaved.toLocaleString()} hours saved annually`;
+        
+        document.getElementById('mttrCalc').innerHTML = `
+          <div class="bill-calc-row">
+            <span class="bill-calc-label">MTTR improvement:</span>
+            <span class="bill-calc-value">3 hrs → 5 min</span>
+          </div>
+          <div class="bill-calc-row">
+            <span class="bill-calc-label">Hours saved:</span>
+            <span class="bill-calc-value">${hoursSaved.toLocaleString()} hrs</span>
+          </div>
+          <div class="bill-calc-formula">@ $${hourlyRate}/hour</div>
+        `;
+      } else {
+        document.getElementById('mttrItem').style.display = 'none';
+      }
+      
+      // Update total with animation
+      const total = marketValueReplaced + findingsSavings + mttrSavings;
+      const totalEl = document.getElementById('totalSavings');
+      totalEl.classList.add('animating');
+      totalEl.textContent = `$${Math.round(total).toLocaleString()}`;
+      setTimeout(() => totalEl.classList.remove('animating'), 400);
+    }
+    
+    // Initialize
+    syncWorkloads(workloadsInput.value);
+    updateMonthlyIncidents();
+  </script>
+</body>
+</html>
