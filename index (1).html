@@ -98,6 +98,13 @@
       color: var(--ink);
     }
     
+    .helper-text {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    
     .input {
       width: 100%;
       max-width: 200px;
@@ -110,6 +117,13 @@
       transition: all 0.2s;
     }
     
+    .input-select {
+      max-width: 100%;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
     .input:focus {
       outline: none;
       border-color: var(--sweet-neon);
@@ -119,6 +133,80 @@
     .input:read-only {
       background: #f5f5f5;
       color: var(--muted);
+    }
+    
+    /* Collapsible Section */
+    .collapsible-section {
+      margin-bottom: 32px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .collapsible-toggle {
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--light-bg);
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      transition: all 0.2s;
+    }
+    
+    .collapsible-toggle:hover {
+      background: #efefef;
+    }
+    
+    .toggle-icon {
+      transition: transform 0.3s ease;
+      font-size: 12px;
+    }
+    
+    .collapsible-toggle.active .toggle-icon {
+      transform: rotate(180deg);
+    }
+    
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: white;
+    }
+    
+    .collapsible-content.show {
+      max-height: 1000px;
+      padding: 24px 20px;
+    }
+    
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--ink);
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--sweet-neon);
+    }
+    
+    .checkbox-item:hover {
+      color: var(--sweet-neon);
     }
     
     /* Gray background for workload inputs */
@@ -556,6 +644,77 @@
         <h2>Tool Consolidation Value</h2>
         <p>Calculate the total market value of security tools that could be consolidated into a unified platform.</p>
         
+        <!-- Collapsible Additional Details -->
+        <div class="collapsible-section">
+          <button type="button" class="collapsible-toggle" id="additionalDetailsToggle" onclick="toggleAdditionalDetails()">
+            <span>Additional Details (Optional)</span>
+            <span class="toggle-icon">▼</span>
+          </button>
+          <div class="collapsible-content" id="additionalDetailsContent">
+            <div class="input-group">
+              <label class="input-label">Where do most of your workloads run?</label>
+              <div class="helper-text">Choose the cloud or infrastructure type that best represents your environment.</div>
+              <select id="cloudEnvironment" class="input input-select">
+                <option value="">Select environment...</option>
+                <option value="aws">AWS</option>
+                <option value="gcp">GCP</option>
+                <option value="azure">Azure</option>
+                <option value="multicloud">Multi-cloud</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="onprem">On-prem</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">Approximate log volume per month</label>
+              <div class="helper-text">If you're not sure, you can skip this — we'll use industry averages for your environment size.</div>
+              <select id="logVolume" class="input input-select">
+                <option value="">Select volume...</option>
+                <option value="notsure">Not sure</option>
+                <option value="low">Low (under 100GB)</option>
+                <option value="medium">Medium (100GB–1TB)</option>
+                <option value="high">High (1–10TB)</option>
+                <option value="veryhigh">Very high (10TB+)</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">Current CNAPP Tool Stack</label>
+              <div class="helper-text">This helps us estimate the consolidation value more accurately. If not sure or not listed, you can skip this.</div>
+              <div class="checkbox-grid">
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="wiz">
+                  <span>Wiz</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="orca">
+                  <span>Orca Security</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="prisma">
+                  <span>Prisma Cloud</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="lacework">
+                  <span>Lacework</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="sysdig">
+                  <span>Sysdig</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="other">
+                  <span>Other</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="none">
+                  <span>None</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div class="input-group">
           <label class="input-label">Number of workloads in your organization</label>
           <input type="number" id="workloads" class="input" placeholder="800" min="1" value="800">
@@ -829,6 +988,14 @@
       // You can replace this with your actual CTA action (e.g., open a form, redirect, etc.)
       alert('Contact our sales team for a precise ROI estimation tailored to your organization.');
       // Or redirect: window.location.href = 'https://your-contact-form-url.com';
+    }
+    
+    function toggleAdditionalDetails() {
+      const toggle = document.getElementById('additionalDetailsToggle');
+      const content = document.getElementById('additionalDetailsContent');
+      
+      toggle.classList.toggle('active');
+      content.classList.toggle('show');
     }
     
     function calculateMTTRSavings() {
