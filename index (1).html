@@ -283,6 +283,21 @@
       animation: popIn 0.6s ease-out;
     }
     
+    .title-emphasis {
+      display: block;
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    
+    .title-subtext {
+      display: block;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    
     @keyframes popIn {
       0% {
         opacity: 0;
@@ -591,11 +606,14 @@
         
         <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Estimated Savings</button>
         
-        <div class="calculation-breakdown" id="consolidationBreakdown">
-          <div class="breakdown-title" id="consolidationTitle">Drawing from the real savings our customers have realized after consolidating their security tools with Sweet, here's what we believe you could save annually:</div>
-          <div class="estimated-value" id="consolidationEstimate">$0</div>
-          <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
-        </div>
+          <div class="calculation-breakdown" id="consolidationBreakdown">
+            <div class="breakdown-title" id="consolidationTitle">
+              <span class="title-emphasis">Estimated savings</span>
+              <span class="title-subtext">based on proven consolidation results with Sweet.</span>
+            </div>
+            <div class="estimated-value" id="consolidationEstimate">$0</div>
+            <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
+          </div>
       </div>
       
       <!-- Section 3: MTTR Reduction Value -->
@@ -755,7 +773,7 @@
       
       if (selectedTools.size > 0 && workloads > 0) {
         btn.disabled = false;
-        btn.textContent = `Calculate Estimated Savings (${selectedTools.size} tools)`;
+        btn.textContent = `Calculate`;
       } else {
         btn.disabled = true;
         btn.textContent = 'Select tools and enter workloads';
