@@ -213,16 +213,32 @@
     
     .calculation-breakdown {
       margin-top: 24px;
-      padding: 20px;
+      padding: 32px;
       background: #f9f9f9;
       border-radius: 12px;
       border-left: 4px solid var(--sweet-neon);
       display: none;
       animation: slideIn 0.3s ease-out;
+      text-align: center;
     }
     
     .calculation-breakdown.show {
       display: block;
+    }
+    
+    .estimated-value {
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--sweet-neon);
+      margin: 24px 0;
+      text-shadow: 0 0 20px rgba(194, 255, 0, 0.2);
+    }
+    
+    .precision-cta {
+      margin-top: 24px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     @keyframes slideIn {
@@ -516,57 +532,50 @@
           <div class="tool-card" data-tool="Runtime Security" data-price="150">
             <div class="tool-name">Runtime Security</div>
             <div class="tool-desc">CWPP & Real-Time Monitoring</div>
-            <div class="tool-price">~$150/workload/year</div>
           </div>
           
           <div class="tool-card" data-tool="CSPM" data-price="100">
             <div class="tool-name">Cloud Security Posture</div>
             <div class="tool-desc">CSPM & Configuration Management</div>
-            <div class="tool-price">~$100/workload/year</div>
           </div>
           
           <div class="tool-card" data-tool="CIEM" data-price="80">
             <div class="tool-name">Identity Management</div>
             <div class="tool-desc">CIEM & Identity Protection</div>
-            <div class="tool-price">~$80/workload/year</div>
           </div>
           
           <div class="tool-card" data-tool="DSPM" data-price="120">
             <div class="tool-name">Data Security</div>
             <div class="tool-desc">DSPM & Data Protection</div>
-            <div class="tool-price">~$120/workload/year</div>
           </div>
           
           <div class="tool-card" data-tool="API" data-price="110">
             <div class="tool-name">API Security</div>
             <div class="tool-desc">API Discovery & Protection</div>
-            <div class="tool-price">~$110/workload/year</div>
           </div>
           
           <div class="tool-card" data-tool="VM" data-price="90">
             <div class="tool-name">Vulnerability Management</div>
             <div class="tool-desc">VM & Prioritization</div>
-            <div class="tool-price">~$90/workload/year</div>
           </div>
           
           <div class="tool-card" data-tool="CDR" data-price="130">
             <div class="tool-name">Detection & Response</div>
             <div class="tool-desc">CDR & SIEM Integration</div>
-            <div class="tool-price">~$130/workload/year</div>
           </div>
           
           <div class="tool-card" data-tool="AI" data-price="140">
             <div class="tool-name">AI/ML Security</div>
             <div class="tool-desc">Model & Pipeline Protection</div>
-            <div class="tool-price">~$140/workload/year</div>
           </div>
         </div>
         
-        <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Market Value Replaced</button>
+        <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Estimated Savings</button>
         
         <div class="calculation-breakdown" id="consolidationBreakdown">
-          <div class="breakdown-title">Calculation Breakdown:</div>
-          <div id="consolidationDetails"></div>
+          <div class="breakdown-title">Estimated Annual Savings</div>
+          <div class="estimated-value" id="consolidationEstimate">$0</div>
+          <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
         </div>
       </div>
       
@@ -610,8 +619,8 @@
       <div class="bill-items" id="billItems">
         <div class="bill-item" id="consolidationItem" style="display: none;">
           <div class="bill-item-left">
-            <div class="bill-item-name">Market Value Replaced</div>
-            <div class="bill-item-desc" id="consolidationDesc">Select tools to calculate</div>
+            <div class="bill-item-name">Tool Consolidation</div>
+            <div class="bill-item-desc" id="consolidationDesc">Estimated annual savings</div>
             <div class="bill-calculation" id="consolidationCalc"></div>
           </div>
           <div class="bill-item-value" id="consolidationValue">$0</div>
@@ -637,8 +646,7 @@
       
       <div class="assumptions">
         <strong>Key Assumptions:</strong><br>
-        • Market prices based on public vendor benchmarks<br>
-        • Benchmarks represent average annual costs per workload<br>
+        • Estimates based on industry benchmarks<br>
         • Analyst time calculated using your hourly rate<br>
         • Industry data from security research reports
       </div>
@@ -725,7 +733,7 @@
       
       if (selectedTools.size > 0 && workloads > 0) {
         btn.disabled = false;
-        btn.textContent = `Calculate Market Value Replaced (${selectedTools.size} tools)`;
+        btn.textContent = `Calculate Estimated Savings (${selectedTools.size} tools)`;
       } else {
         btn.disabled = true;
         btn.textContent = 'Select tools and enter workloads';
@@ -744,38 +752,36 @@
       // Delay calculation for suspense
       setTimeout(() => {
         let currentToolsCost = 0;
-        let breakdownHTML = '';
         
+        // Calculate internally (black box)
         selectedTools.forEach(tool => {
           const card = document.querySelector(`[data-tool="${tool}"]`);
           const price = parseInt(card.dataset.price);
           const toolCost = price * workloads;
           currentToolsCost += toolCost;
-          
-          breakdownHTML += `
-            <div class="breakdown-row">
-              <span class="breakdown-label">${tool}</span>
-              <span class="breakdown-value">$${toolCost.toLocaleString()}</span>
-            </div>
-          `;
         });
         
         marketValueReplaced = currentToolsCost;
         
-        breakdownHTML += `
-          <div class="breakdown-row breakdown-total">
-            <span class="breakdown-label">Estimated market value replaced</span>
-            <span class="breakdown-value">$${marketValueReplaced.toLocaleString()}</span>
-          </div>
-        `;
+        // Display only the estimated value
+        const estimateEl = document.getElementById('consolidationEstimate');
+        estimateEl.classList.add('animating');
+        estimateEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
+        setTimeout(() => estimateEl.classList.remove('animating'), 400);
         
-        document.getElementById('consolidationDetails').innerHTML = breakdownHTML;
         breakdownDiv.classList.remove('calculating');
         breakdownDiv.classList.add('show');
         
         // Update sidebar with delay
         updateSidebar();
       }, 200);
+    }
+    
+    function openPreciseEstimate() {
+      // Trigger the same action as "Get Started with Sweet Security"
+      // You can replace this with your actual CTA action (e.g., open a form, redirect, etc.)
+      alert('Contact our sales team for a precise ROI estimation tailored to your organization.');
+      // Or redirect: window.location.href = 'https://your-contact-form-url.com';
     }
     
     function calculateMTTRSavings() {
@@ -814,39 +820,10 @@
         consolidationValueEl.classList.add('animating');
         consolidationValueEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
         setTimeout(() => consolidationValueEl.classList.remove('animating'), 400);
-        document.getElementById('consolidationDesc').textContent = `${selectedTools.size} tools consolidated`;
+        document.getElementById('consolidationDesc').textContent = `Estimated savings from ${selectedTools.size} tools`;
         
-        // Add calculation breakdown
-        const workloads = parseInt(workloadsInput.value) || 0;
-        let toolBreakdown = '';
-        let toolCount = 0;
-        selectedTools.forEach(tool => {
-          const card = document.querySelector(`[data-tool="${tool}"]`);
-          const price = parseInt(card.dataset.price);
-          toolCount++;
-          if (toolCount <= 3) {
-            toolBreakdown += `
-              <div class="bill-calc-row">
-                <span class="bill-calc-label">${tool}:</span>
-                <span class="bill-calc-value">$${price} × ${workloads}</span>
-              </div>
-            `;
-          }
-        });
-        
-        if (selectedTools.size > 3) {
-          toolBreakdown += `
-            <div class="bill-calc-row">
-              <span class="bill-calc-label">+${selectedTools.size - 3} more...</span>
-              <span class="bill-calc-value"></span>
-            </div>
-          `;
-        }
-        
-        document.getElementById('consolidationCalc').innerHTML = `
-          ${toolBreakdown}
-          <div class="bill-calc-formula">Sum of ${selectedTools.size} tool costs</div>
-        `;
+        // Clean summary - no detailed breakdown
+        document.getElementById('consolidationCalc').innerHTML = '';
       } else {
         document.getElementById('consolidationItem').style.display = 'none';
       }
