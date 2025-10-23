@@ -646,11 +646,11 @@
         
         <!-- Collapsible Additional Details -->
         <div class="collapsible-section">
-          <button type="button" class="collapsible-toggle" id="additionalDetailsToggle" onclick="toggleAdditionalDetails()">
+          <button type="button" class="collapsible-toggle active" id="additionalDetailsToggle" onclick="toggleAdditionalDetails()">
             <span>Additional Details (Optional)</span>
             <span class="toggle-icon">▼</span>
           </button>
-          <div class="collapsible-content" id="additionalDetailsContent">
+          <div class="collapsible-content show" id="additionalDetailsContent">
             <div class="input-group">
               <label class="input-label">Where do most of your workloads run?</label>
               <div class="helper-text">Choose the cloud or infrastructure type that best represents your environment.</div>
@@ -978,6 +978,11 @@
         breakdownDiv.classList.remove('calculating');
         breakdownDiv.classList.add('show');
         
+        // Scroll to the breakdown after a short delay
+        setTimeout(() => {
+          breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+        
         // Update sidebar with delay
         updateSidebar();
       }, 200);
@@ -1023,6 +1028,14 @@
         
         // Update sidebar
         updateSidebar();
+        
+        // Scroll to the sidebar to show the updated results
+        setTimeout(() => {
+          const mttrItem = document.getElementById('mttrItem');
+          if (mttrItem && mttrItem.style.display !== 'none') {
+            mttrItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
       }, 200);
     }
     
