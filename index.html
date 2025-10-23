@@ -359,6 +359,26 @@
       transition: opacity 0.2s;
     }
     
+    .loading-spinner {
+      display: none;
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--sweet-neon);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 24px auto;
+    }
+    
+    .loading-spinner.show {
+      display: block;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
     .breakdown-title {
       font-weight: 700;
       font-size: 18px;
@@ -765,6 +785,8 @@
         
         <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Estimated Savings</button>
         
+        <div class="loading-spinner" id="consolidationSpinner"></div>
+        
           <div class="calculation-breakdown" id="consolidationBreakdown">
             <div class="breakdown-title" id="consolidationTitle">
               <span class="title-emphasis">Estimated savings</span>
@@ -805,6 +827,8 @@
         </div>
         
         <button class="calculate-btn" id="mttrBtn" onclick="calculateMTTRSavings()">Calculate MTTR Reduction Value</button>
+        
+        <div class="loading-spinner" id="mttrSpinner"></div>
       </div>
     </div>
     
@@ -944,12 +968,16 @@
       
       if (selectedTools.size === 0 || workloads === 0) return;
       
-      // Add calculating state
+      // Add calculating state and show spinner
       const breakdownDiv = document.getElementById('consolidationBreakdown');
+      const spinner = document.getElementById('consolidationSpinner');
       breakdownDiv.classList.add('calculating');
+      spinner.classList.add('show');
       
       // Delay calculation for suspense (0.8 seconds)
       setTimeout(() => {
+        // Hide spinner
+        spinner.classList.remove('show');
         let currentToolsCost = 0;
         
         // Calculate internally (black box)
@@ -1012,8 +1040,14 @@
       
       if (workloads === 0) return;
       
+      // Show spinner
+      const spinner = document.getElementById('mttrSpinner');
+      spinner.classList.add('show');
+      
       // Delay calculation for suspense (0.8 seconds)
       setTimeout(() => {
+        // Hide spinner
+        spinner.classList.remove('show');
         // Calculate annual incidents from monthly
         const annualIncidents = monthlyIncidentsValue * 12;
         
