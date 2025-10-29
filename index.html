@@ -830,6 +830,54 @@
         
         <div class="loading-spinner" id="mttrSpinner"></div>
       </div>
+      
+      <!-- Section 4: Vulnerability Prioritization ROI -->
+      <div class="section">
+        <h2>Vulnerability Prioritization ROI</h2>
+        <p>Estimate the savings gained by focusing only on truly critical vulnerabilities.</p>
+        
+        <div class="input-group">
+          <label class="input-label">Input source</label>
+          <select id="vulnInputSource" class="input input-select" onchange="toggleVulnInput()">
+            <option value="workload">Workload-based</option>
+            <option value="manual">Manual vulnerability count</option>
+          </select>
+        </div>
+        
+        <div class="findings-inputs">
+          <div class="input-group">
+            <label class="input-label">Workloads</label>
+            <input type="number" id="workloadsVuln" class="input" value="800" min="1">
+          </div>
+          <div class="input-group" id="manualVulnGroup" style="display: none;">
+            <label class="input-label">Vulnerabilities before prioritization</label>
+            <input type="number" id="vulnBefore" class="input" placeholder="e.g., 10000" min="1">
+          </div>
+        </div>
+        
+        <div class="benchmark-list">
+          <h4>Values used as the basis for the calculation</h4>
+          <ul>
+            <li><strong>Workload-based:</strong> Auto-calculated from workloads × industry average vulnerabilities</li>
+            <li><strong>Time per vulnerability:</strong> 10 person-hours to remediate</li>
+            <li><strong>Engineer hourly cost:</strong> $100/hour (SecOps / DevOps average)</li>
+            <li><strong>Reduction rate:</strong> 99.684% of vulnerabilities deprioritized as non-critical</li>
+          </ul>
+        </div>
+        
+        <button class="calculate-btn" id="vulnBtn" onclick="calculateVulnSavings()">Calculate Vulnerability Savings</button>
+        
+        <div class="loading-spinner" id="vulnSpinner"></div>
+        
+        <div class="calculation-breakdown" id="vulnBreakdown">
+          <div class="breakdown-title" id="vulnTitle">
+            <span class="title-emphasis">Estimated savings</span>
+            <span class="title-subtext">from intelligent vulnerability prioritization.</span>
+          </div>
+          <div class="estimated-value" id="vulnEstimate">$0</div>
+          <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
+        </div>
+      </div>
     </div>
     
     <!-- Sidebar Checkout -->
@@ -853,6 +901,15 @@
             <div class="bill-calculation" id="mttrCalc"></div>
           </div>
           <div class="bill-item-value" id="mttrValue">$0</div>
+        </div>
+        
+        <div class="bill-item" id="vulnItem" style="display: none;">
+          <div class="bill-item-left">
+            <div class="bill-item-name">Vulnerability Prioritization</div>
+            <div class="bill-item-desc" id="vulnDesc">Focus on critical vulnerabilities</div>
+            <div class="bill-calculation" id="vulnCalc"></div>
+          </div>
+          <div class="bill-item-value" id="vulnValue">$0</div>
         </div>
       </div>
       
@@ -881,13 +938,21 @@
     const SWEET_MTTR_MINUTES = 5;
     const SWEET_MTTR_HOURS = SWEET_MTTR_MINUTES / 60; // 0.0833 hours
     
+    // Vulnerability Prioritization Constants
+    const VULNS_PER_WORKLOAD = 50; // Average vulnerabilities per workload
+    const HOURS_PER_VULN = 10; // Person-hours to remediate one vulnerability
+    const ENGINEER_HOURLY_COST = 100; // $/hour for SecOps/DevOps engineer
+    const VULN_REDUCTION_RATE = 0.99684; // 99.684% reduction
+    
     let selectedTools = new Set();
     let marketValueReplaced = 0;
     let mttrSavings = 0;
+    let vulnSavings = 0;
     
     // Sync workloads between sections
     const workloadsInput = document.getElementById('workloads');
     const workloadsMTTR = document.getElementById('workloadsMTTR');
+    const workloadsVuln = document.getElementById('workloadsVuln');
     const monthlyIncidents = document.getElementById('monthlyIncidents');
     
     // Track if user has manually changed monthly incidents
@@ -908,6 +973,7 @@
     function syncWorkloads(sourceValue) {
       workloadsInput.value = sourceValue;
       workloadsMTTR.value = sourceValue;
+      workloadsVuln.value = sourceValue;
       updateMonthlyIncidents();
       updateConsolidationButton();
     }
@@ -918,6 +984,10 @@
     
     workloadsMTTR.addEventListener('input', () => {
       syncWorkloads(workloadsMTTR.value);
+    });
+    
+    workloadsVuln.addEventListener('input', () => {
+      syncWorkloads(workloadsVuln.value);
     });
     
     // Track manual changes to monthly incidents
@@ -1075,6 +1145,76 @@
       }, 800);
     }
     
+    function toggleVulnInput() {
+      const source = document.getElementById('vulnInputSource').value;
+      const manualGroup = document.getElementById('manualVulnGroup');
+      const workloadsGroup = document.getElementById('workloadsVuln').closest('.input-group');
+      
+      if (source === 'manual') {
+        manualGroup.style.display = 'block';
+        workloadsGroup.style.display = 'none';
+      } else {
+        manualGroup.style.display = 'none';
+        workloadsGroup.style.display = 'block';
+      }
+    }
+    
+    // Track if vulnerability breakdown has been shown before
+    let vulnShownBefore = false;
+    
+    function calculateVulnSavings() {
+      const source = document.getElementById('vulnInputSource').value;
+      let vulnsBefore = 0;
+      
+      if (source === 'workload') {
+        const workloads = parseInt(workloadsVuln.value) || 0;
+        if (workloads === 0) return;
+        vulnsBefore = workloads * VULNS_PER_WORKLOAD;
+      } else {
+        vulnsBefore = parseInt(document.getElementById('vulnBefore').value) || 0;
+        if (vulnsBefore === 0) return;
+      }
+      
+      // Show spinner
+      const spinner = document.getElementById('vulnSpinner');
+      const breakdownDiv = document.getElementById('vulnBreakdown');
+      spinner.classList.add('show');
+      breakdownDiv.classList.add('calculating');
+      
+      // Delay calculation for suspense (0.8 seconds)
+      setTimeout(() => {
+        // Hide spinner
+        spinner.classList.remove('show');
+        
+        // Formula: Savings = vulnsBefore × 0.99684 × 10 × 100
+        vulnSavings = vulnsBefore * VULN_REDUCTION_RATE * HOURS_PER_VULN * ENGINEER_HOURLY_COST;
+        
+        // Display only the estimated value
+        const estimateEl = document.getElementById('vulnEstimate');
+        estimateEl.classList.add('animating');
+        estimateEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
+        setTimeout(() => estimateEl.classList.remove('animating'), 400);
+        
+        // Add pop-in animation to title only on first show
+        if (!vulnShownBefore) {
+          const titleEl = document.getElementById('vulnTitle');
+          titleEl.classList.add('animate-once');
+          vulnShownBefore = true;
+        }
+        
+        breakdownDiv.classList.remove('calculating');
+        breakdownDiv.classList.add('show');
+        
+        // Scroll to the breakdown after a short delay
+        setTimeout(() => {
+          breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+        
+        // Update sidebar
+        updateSidebar();
+      }, 800);
+    }
+    
     function updateSidebar() {
       // Update consolidation item
       if (marketValueReplaced > 0) {
@@ -1125,8 +1265,42 @@
         document.getElementById('mttrItem').style.display = 'none';
       }
       
+      // Update vulnerability item
+      if (vulnSavings > 0) {
+        document.getElementById('vulnItem').style.display = 'flex';
+        const vulnValueEl = document.getElementById('vulnValue');
+        vulnValueEl.classList.add('animating');
+        vulnValueEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
+        setTimeout(() => vulnValueEl.classList.remove('animating'), 400);
+        
+        const source = document.getElementById('vulnInputSource').value;
+        if (source === 'workload') {
+          const workloads = parseInt(workloadsVuln.value) || 0;
+          const vulnsBefore = workloads * VULNS_PER_WORKLOAD;
+          document.getElementById('vulnDesc').textContent = `${Math.round(vulnsBefore * VULN_REDUCTION_RATE).toLocaleString()} vulnerabilities deprioritized`;
+        } else {
+          const vulnsBefore = parseInt(document.getElementById('vulnBefore').value) || 0;
+          document.getElementById('vulnDesc').textContent = `${Math.round(vulnsBefore * VULN_REDUCTION_RATE).toLocaleString()} vulnerabilities deprioritized`;
+        }
+        
+        // Add calculation breakdown
+        document.getElementById('vulnCalc').innerHTML = `
+          <div class="bill-calc-row">
+            <span class="bill-calc-label">Reduction rate:</span>
+            <span class="bill-calc-value">99.684%</span>
+          </div>
+          <div class="bill-calc-row">
+            <span class="bill-calc-label">Time saved:</span>
+            <span class="bill-calc-value">${Math.round(vulnSavings / ENGINEER_HOURLY_COST).toLocaleString()} hrs</span>
+          </div>
+          <div class="bill-calc-formula">@ $${ENGINEER_HOURLY_COST}/hour</div>
+        `;
+      } else {
+        document.getElementById('vulnItem').style.display = 'none';
+      }
+      
       // Update total with animation
-      const total = marketValueReplaced + mttrSavings;
+      const total = marketValueReplaced + mttrSavings + vulnSavings;
       const totalEl = document.getElementById('totalSavings');
       totalEl.classList.add('animating');
       totalEl.textContent = `$${Math.round(total).toLocaleString()}`;
