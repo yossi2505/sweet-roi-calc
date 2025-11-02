@@ -1048,17 +1048,58 @@
       setTimeout(() => {
         // Hide spinner
         spinner.classList.remove('show');
-        let currentToolsCost = 0;
         
-        // Calculate internally (black box)
+        // Calculate base tool value (sum of data-price attributes)
+        let baseToolValue = 0;
         selectedTools.forEach(tool => {
           const card = document.querySelector(`[data-tool="${tool}"]`);
           const price = parseInt(card.dataset.price);
-          const toolCost = price * workloads;
-          currentToolsCost += toolCost;
+          baseToolValue += price;
         });
         
-        marketValueReplaced = currentToolsCost;
+        // Get environment weight
+        const cloudEnvironment = document.getElementById('cloudEnvironment').value;
+        const environmentWeights = {
+          'aws': 1.15,
+          'azure': 1.10,
+          'gcp': 1.05,
+          'multicloud': 1.25,
+          'hybrid': 1.10,
+          'onprem': 0.95
+        };
+        const environmentWeight = environmentWeights[cloudEnvironment] || 1.0;
+        
+        // Get log volume weight
+        const logVolume = document.getElementById('logVolume').value;
+        const logVolumeWeights = {
+          'low': 0.9,
+          'medium': 1.0,
+          'high': 1.15,
+          'veryhigh': 1.3
+        };
+        const logVolumeWeight = logVolumeWeights[logVolume] || 1.0;
+        
+        // Get vendor weight (highest single vendor, not cumulative)
+        const cnappCheckboxes = document.querySelectorAll('input[name="cnappTools"]:checked');
+        const vendorWeights = {
+          'wiz': 1.25,
+          'orca': 1.20,
+          'prisma': 1.15,
+          'lacework': 1.10,
+          'sysdig': 1.10,
+          'other': 1.05,
+          'none': 1.0
+        };
+        let vendorWeight = 1.0;
+        cnappCheckboxes.forEach(checkbox => {
+          const weight = vendorWeights[checkbox.value] || 1.0;
+          if (weight > vendorWeight) {
+            vendorWeight = weight;
+          }
+        });
+        
+        // Apply weighted formula
+        marketValueReplaced = baseToolValue * workloads * environmentWeight * logVolumeWeight * vendorWeight;
         
         // Display only the estimated value
         const estimateEl = document.getElementById('consolidationEstimate');
