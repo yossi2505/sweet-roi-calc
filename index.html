@@ -209,6 +209,30 @@
       color: var(--sweet-neon);
     }
     
+    .manual-edit-btn {
+      padding: 8px 16px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    
+    .manual-edit-btn:hover {
+      border-color: var(--sweet-neon);
+      color: var(--sweet-neon);
+    }
+    
+    .manual-edit-btn.editing {
+      background: var(--sweet-neon);
+      border-color: var(--sweet-neon);
+      color: var(--ink);
+    }
+    
     /* Gray background for workload inputs */
     #workloadsFindings, #workloadsMTTR, #monthlyIncidents {
       background: #f5f5f5;
@@ -837,32 +861,21 @@
         <p>Estimate the savings gained by focusing only on truly critical vulnerabilities.</p>
         
         <div class="input-group">
-          <label class="input-label">Input source</label>
-          <select id="vulnInputSource" class="input input-select" onchange="toggleVulnInput()">
-            <option value="workload">Workload-based</option>
-            <option value="manual">Manual vulnerability count</option>
-          </select>
+          <label class="input-label">How many workloads do you have?</label>
+          <input type="number" id="workloadsVuln" class="input" value="800" min="1" oninput="updateEstimatedVulns()">
         </div>
         
-        <div class="findings-inputs">
-          <div class="input-group">
-            <label class="input-label">Workloads</label>
-            <input type="number" id="workloadsVuln" class="input" value="800" min="1">
-          </div>
-          <div class="input-group" id="manualVulnGroup" style="display: none;">
-            <label class="input-label">Vulnerabilities before prioritization</label>
-            <input type="number" id="vulnBefore" class="input" placeholder="e.g., 10000" min="1">
+        <div class="input-group">
+          <label class="input-label" style="font-weight: 400; color: var(--muted);">Based on customer benchmarks, we estimate you have approximately:</label>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <input type="number" id="vulnEstimated" class="input" value="8400" min="1" readonly style="max-width: 150px;">
+            <button type="button" class="manual-edit-btn" id="manualEditBtn" onclick="toggleManualVulnEdit()">Enter manually</button>
           </div>
         </div>
         
-        <div class="benchmark-list">
-          <h4>Values used as the basis for the calculation</h4>
-          <ul>
-            <li><strong>Workload-based:</strong> Auto-calculated from workloads × industry average vulnerabilities</li>
-            <li><strong>Time per vulnerability:</strong> 10 person-hours to remediate</li>
-            <li><strong>Engineer hourly cost:</strong> $100/hour (SecOps / DevOps average)</li>
-            <li><strong>Reduction rate:</strong> 99.684% of vulnerabilities deprioritized as non-critical</li>
-          </ul>
+        <div style="padding: 12px 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px;">
+          <strong style="font-size: 14px; color: var(--ink);">Assumptions:</strong>
+          <span style="font-size: 14px; color: var(--muted);"> 10h per vulnerability × $100/hr × 99.684% reduction rate.</span>
         </div>
         
         <button class="calculate-btn" id="vulnBtn" onclick="calculateVulnSavings()">Calculate Vulnerability Savings</button>
@@ -933,13 +946,13 @@
   <script>
     // MTTR Constants
     const INCIDENTS_PER_WORKLOAD_YEAR = 12;
-    const INCIDENTS_PER_WORKLOAD_MONTH = 5; // Average incidents per workload per month
+    const INCIDENTS_PER_WORKLOAD_MONTH = 1; // Average incidents per workload per month
     const BENCHMARK_MTTR_HOURS = 3;
     const SWEET_MTTR_MINUTES = 5;
     const SWEET_MTTR_HOURS = SWEET_MTTR_MINUTES / 60; // 0.0833 hours
     
     // Vulnerability Prioritization Constants
-    const VULNS_PER_WORKLOAD = 50; // Average vulnerabilities per workload
+    const VULNS_PER_WORKLOAD = 10.5; // Average vulnerabilities per workload
     const HOURS_PER_VULN = 10; // Person-hours to remediate one vulnerability
     const ENGINEER_HOURLY_COST = 100; // $/hour for SecOps/DevOps engineer
     const VULN_REDUCTION_RATE = 0.99684; // 99.684% reduction
@@ -1186,17 +1199,27 @@
       }, 800);
     }
     
-    function toggleVulnInput() {
-      const source = document.getElementById('vulnInputSource').value;
-      const manualGroup = document.getElementById('manualVulnGroup');
-      const workloadsGroup = document.getElementById('workloadsVuln').closest('.input-group');
+    function updateEstimatedVulns() {
+      const workloads = parseInt(document.getElementById('workloadsVuln').value) || 0;
+      const estimated = Math.round(workloads * VULNS_PER_WORKLOAD);
+      document.getElementById('vulnEstimated').value = estimated;
+    }
+    
+    function toggleManualVulnEdit() {
+      const vulnEstimatedInput = document.getElementById('vulnEstimated');
+      const btn = document.getElementById('manualEditBtn');
       
-      if (source === 'manual') {
-        manualGroup.style.display = 'block';
-        workloadsGroup.style.display = 'none';
+      if (vulnEstimatedInput.hasAttribute('readonly')) {
+        vulnEstimatedInput.removeAttribute('readonly');
+        vulnEstimatedInput.style.background = 'white';
+        vulnEstimatedInput.focus();
+        btn.textContent = 'Lock';
+        btn.classList.add('editing');
       } else {
-        manualGroup.style.display = 'none';
-        workloadsGroup.style.display = 'block';
+        vulnEstimatedInput.setAttribute('readonly', 'readonly');
+        vulnEstimatedInput.style.background = '#f5f5f5';
+        btn.textContent = 'Enter manually';
+        btn.classList.remove('editing');
       }
     }
     
@@ -1204,17 +1227,8 @@
     let vulnShownBefore = false;
     
     function calculateVulnSavings() {
-      const source = document.getElementById('vulnInputSource').value;
-      let vulnsBefore = 0;
-      
-      if (source === 'workload') {
-        const workloads = parseInt(workloadsVuln.value) || 0;
-        if (workloads === 0) return;
-        vulnsBefore = workloads * VULNS_PER_WORKLOAD;
-      } else {
-        vulnsBefore = parseInt(document.getElementById('vulnBefore').value) || 0;
-        if (vulnsBefore === 0) return;
-      }
+      const vulnsBefore = parseInt(document.getElementById('vulnEstimated').value) || 0;
+      if (vulnsBefore === 0) return;
       
       // Show spinner
       const spinner = document.getElementById('vulnSpinner');
@@ -1314,15 +1328,8 @@
         vulnValueEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
         setTimeout(() => vulnValueEl.classList.remove('animating'), 400);
         
-        const source = document.getElementById('vulnInputSource').value;
-        if (source === 'workload') {
-          const workloads = parseInt(workloadsVuln.value) || 0;
-          const vulnsBefore = workloads * VULNS_PER_WORKLOAD;
-          document.getElementById('vulnDesc').textContent = `${Math.round(vulnsBefore * VULN_REDUCTION_RATE).toLocaleString()} vulnerabilities deprioritized`;
-        } else {
-          const vulnsBefore = parseInt(document.getElementById('vulnBefore').value) || 0;
-          document.getElementById('vulnDesc').textContent = `${Math.round(vulnsBefore * VULN_REDUCTION_RATE).toLocaleString()} vulnerabilities deprioritized`;
-        }
+        const vulnsBefore = parseInt(document.getElementById('vulnEstimated').value) || 0;
+        document.getElementById('vulnDesc').textContent = `${Math.round(vulnsBefore * VULN_REDUCTION_RATE).toLocaleString()} vulnerabilities deprioritized`;
         
         // Add calculation breakdown
         document.getElementById('vulnCalc').innerHTML = `
