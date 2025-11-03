@@ -135,6 +135,17 @@
       color: var(--muted);
     }
     
+    /* Remove number input arrows/spinners */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    
     /* Collapsible Section */
     .collapsible-section {
       margin-bottom: 32px;
@@ -678,7 +689,7 @@
 <body>
   <div class="hero">
     <h1><b>ROI Calculator</b></h1>
-    <p>Discover the market value of security tools you could consolidate and the potential savings from reducing alert fatigue</p>
+    <p>  <br> </p>
   </div>
   
   <div class="container">
@@ -697,7 +708,7 @@
           <div class="collapsible-content show" id="additionalDetailsContent">
             <div class="input-group">
               <label class="input-label">Where do most of your workloads run?</label>
-              <div class="helper-text">Choose the cloud or infrastructure type that best represents your environment.</div>
+              <div class="helper-text">Choose the cloud or infrastructure type: </div>
               <select id="cloudEnvironment" class="input input-select">
                 <option value="">Select environment...</option>
                 <option value="aws">AWS</option>
@@ -711,7 +722,7 @@
             
             <div class="input-group">
               <label class="input-label">Approximate log volume per month</label>
-              <div class="helper-text">If you're not sure, you can skip this — we'll use industry averages for your environment size.</div>
+              <div class="helper-text">If you're not sure, you can skip this.</div>
               <select id="logVolume" class="input input-select">
                 <option value="">Select volume...</option>
                 <option value="notsure">Not sure</option>
@@ -724,7 +735,7 @@
             
             <div class="input-group">
               <label class="input-label">Current CNAPP Tool Stack</label>
-              <div class="helper-text">This helps us estimate the consolidation value more accurately. If not sure or not listed, you can skip this.</div>
+              <div class="helper-text">This helps us estimate the consolidation value more accurately. If not sure, you can skip this.</div>
               <div class="checkbox-grid">
                 <label class="checkbox-item">
                   <input type="checkbox" name="cnappTools" value="wiz">
@@ -875,7 +886,7 @@
         
         <div style="padding: 12px 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px;">
           <strong style="font-size: 14px; color: var(--ink);">Assumptions:</strong>
-          <span style="font-size: 14px; color: var(--muted);"> 10h per vulnerability × $100/hr × 99.684% reduction rate.</span>
+          <span style="font-size: 14px; color: var(--muted);"> 10h per vulnerability × $100/hr × 99.684% reduction rate. (based on customer benchmarks)</span>
         </div>
         
         <button class="calculate-btn" id="vulnBtn" onclick="calculateVulnSavings()">Calculate Vulnerability Savings</button>
