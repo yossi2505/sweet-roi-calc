@@ -244,6 +244,45 @@
       color: var(--ink);
     }
     
+    .calc-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+    
+    .calc-step:last-child {
+      margin-bottom: 0;
+    }
+    
+    .calc-number {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    
+    .calc-label {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    
+    .calc-operator {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--muted);
+      margin: 0 8px;
+    }
+    
+    .calc-equals {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--sweet-neon);
+      margin: 16px 0;
+      text-align: center;
+    }
+    
     /* Gray background for workload inputs */
     #workloadsFindings, #workloadsMTTR, #monthlyIncidents {
       background: #f5f5f5;
@@ -852,18 +891,19 @@
           </div>
         </div>
         
-        <div class="benchmark-list">
-          <h4>Values used as the basis for the calculation</h4>
-          <ul>
-            <li><strong>Auto-calculated:</strong> Monthly incidents = Workloads × 5 incidents/workload/month (you can change this)</li>
-            <li><strong>Industry benchmark MTTR:</strong> 3 hours to resolve an incident</li>
-            <li><strong>Sweet's MTTR:</strong> 5 minutes with platform automation</li>
-          </ul>
-        </div>
-        
         <button class="calculate-btn" id="mttrBtn" onclick="calculateMTTRSavings()">Calculate MTTR Reduction Value</button>
         
         <div class="loading-spinner" id="mttrSpinner"></div>
+        
+        <div class="calculation-breakdown" id="mttrBreakdown">
+          <div class="breakdown-title" id="mttrTitle">
+            <span class="title-emphasis">Estimated savings</span>
+            <span class="title-subtext">from reducing incident resolution time.</span>
+          </div>
+          <div id="mttrCalculationSteps" style="margin: 24px 0; padding: 20px; background: #f9f9f9; border-radius: 12px; text-align: left;"></div>
+          <div class="estimated-value" id="mttrEstimateValue">$0</div>
+          <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
+        </div>
       </div>
       
       <!-- Section 4: Vulnerability Prioritization ROI -->
@@ -984,6 +1024,9 @@
     
     // Track if consolidation breakdown has been shown before
     let consolidationShownBefore = false;
+    
+    // Track if MTTR breakdown has been shown before
+    let mttrShownBefore = false;
     
     // Function to update monthly incidents based on workloads
     function updateMonthlyIncidents() {
@@ -1183,6 +1226,7 @@
       setTimeout(() => {
         // Hide spinner
         spinner.classList.remove('show');
+        
         // Calculate annual incidents from monthly
         const annualIncidents = monthlyIncidentsValue * 12;
         
@@ -1194,18 +1238,62 @@
         const sweetTotalHours = annualIncidents * SWEET_MTTR_HOURS;
         const sweetCost = sweetTotalHours * hourlyRate;
         
+        // Calculate time saved
+        const hoursSaved = currentTotalHours - sweetTotalHours;
+        
         // Calculate savings
         mttrSavings = currentCost - sweetCost;
+        
+        // Build calculation breakdown HTML
+        const stepsHTML = `
+          <div class="calc-step">
+            <span class="calc-number">${monthlyIncidentsValue.toLocaleString()}</span>
+            <span class="calc-label">incidents/month</span>
+            <span class="calc-operator">×</span>
+            <span class="calc-number">12</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-operator">=</span>
+            <span class="calc-number">${annualIncidents.toLocaleString()}</span>
+            <span class="calc-label">annual incidents</span>
+          </div>
+          <div class="calc-step" style="margin-top: 20px;">
+            <span class="calc-number">${hoursSaved.toLocaleString()}</span>
+            <span class="calc-label">hours saved (3h → 5min per incident)</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-operator">×</span>
+            <span class="calc-number">$${hourlyRate}</span>
+            <span class="calc-label">per hour</span>
+          </div>
+          <div class="calc-equals">= Annual Savings</div>
+        `;
+        
+        document.getElementById('mttrCalculationSteps').innerHTML = stepsHTML;
+        
+        // Display the final value
+        const estimateEl = document.getElementById('mttrEstimateValue');
+        estimateEl.classList.add('animating');
+        estimateEl.textContent = `$${Math.round(mttrSavings).toLocaleString()}`;
+        setTimeout(() => estimateEl.classList.remove('animating'), 400);
+        
+        // Show breakdown
+        const breakdownDiv = document.getElementById('mttrBreakdown');
+        breakdownDiv.classList.add('show');
+        
+        // Add pop-in animation to title only on first show
+        if (!mttrShownBefore) {
+          const titleEl = document.getElementById('mttrTitle');
+          titleEl.classList.add('animate-once');
+          mttrShownBefore = true;
+        }
         
         // Update sidebar
         updateSidebar();
         
-        // Scroll to the sidebar to show the updated results
+        // Scroll to the breakdown
         setTimeout(() => {
-          const mttrItem = document.getElementById('mttrItem');
-          if (mttrItem && mttrItem.style.display !== 'none') {
-            mttrItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
+          breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 300);
       }, 800);
     }
