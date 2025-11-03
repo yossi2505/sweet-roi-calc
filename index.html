@@ -63,28 +63,95 @@
       background: white;
       border-radius: 16px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      padding: 24px;
       margin-bottom: 20px;
       margin-top: -15px;
       position: relative;
       z-index: 2;
+      overflow: hidden;
     }
     
     .section:first-child {
       margin-top: -25px;
     }
     
+    .section-header {
+      padding: 20px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .section-header:hover {
+      background: #fafafa;
+    }
+    
+    .section.collapsed .section-header {
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .section-header-left {
+      flex: 1;
+    }
+    
+    .section-header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .section-result-preview {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--sweet-neon);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .section.collapsed .section-result-preview {
+      opacity: 1;
+    }
+    
+    .section.collapsed.has-result .section-result-preview {
+      opacity: 1;
+    }
+    
+    .section-toggle-icon {
+      font-size: 20px;
+      transition: transform 0.3s ease;
+      color: var(--muted);
+    }
+    
+    .section.collapsed .section-toggle-icon {
+      transform: rotate(-90deg);
+    }
+    
     .section h2 {
       font-family: 'Playfair Display', serif;
       font-size: 24px;
-      margin: 0 0 8px;
+      margin: 0 0 6px;
       color: var(--ink);
     }
     
     .section p {
       color: var(--muted);
-      margin: 0 0 16px;
+      margin: 0;
       font-size: 14px;
+    }
+    
+    .section-content {
+      padding: 0 24px 24px;
+      max-height: 5000px;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    
+    .section.collapsed .section-content {
+      max-height: 0;
+      padding: 0 24px;
     }
     
     .input-group {
@@ -735,9 +802,18 @@
   <div class="container">
     <div class="calculator-sections">
       <!-- Section 1: Tool Consolidation -->
-      <div class="section">
-        <h2>Tool Consolidation Value</h2>
-        <p>Calculate the total market value of security tools that could be consolidated into a unified platform.</p>
+      <div class="section" id="section-consolidation">
+        <div class="section-header" onclick="toggleSection('consolidation')">
+          <div class="section-header-left">
+            <h2>Tool Consolidation Value</h2>
+            <p>Calculate the total market value of security tools that could be consolidated into a unified platform.</p>
+          </div>
+          <div class="section-header-right">
+            <span class="section-result-preview" id="preview-consolidation"></span>
+            <span class="section-toggle-icon">▼</span>
+          </div>
+        </div>
+        <div class="section-content">
         
         <!-- Collapsible Additional Details -->
         <div class="collapsible-section">
@@ -857,12 +933,22 @@
             <div class="estimated-value" id="consolidationEstimate">$0</div>
             <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
           </div>
+        </div>
       </div>
       
       <!-- Section 3: MTTR Reduction Value -->
-      <div class="section">
-        <h2>MTTR Reduction Value Calculator</h2>
-        <p>Calculate analyst time saved by reducing Mean Time To Resolve (MTTR) from industry average to Sweet's optimized response time.</p>
+      <div class="section collapsed" id="section-mttr">
+        <div class="section-header" onclick="toggleSection('mttr')">
+          <div class="section-header-left">
+            <h2>MTTR Reduction Value Calculator</h2>
+            <p>Calculate analyst time saved by reducing Mean Time To Resolve (MTTR) from industry average to Sweet's optimized response time.</p>
+          </div>
+          <div class="section-header-right">
+            <span class="section-result-preview" id="preview-mttr"></span>
+            <span class="section-toggle-icon">▼</span>
+          </div>
+        </div>
+        <div class="section-content">
         
         <div class="findings-inputs">
           <div class="input-group">
@@ -892,12 +978,22 @@
           <div class="estimated-value" id="mttrEstimateValue">$0</div>
           <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
         </div>
+        </div>
       </div>
       
       <!-- Section 4: Vulnerability Prioritization ROI -->
-      <div class="section">
-        <h2>Vulnerability Prioritization ROI</h2>
-        <p>Estimate the savings gained by focusing only on truly critical vulnerabilities.</p>
+      <div class="section collapsed" id="section-vuln">
+        <div class="section-header" onclick="toggleSection('vuln')">
+          <div class="section-header-left">
+            <h2>Vulnerability Prioritization ROI</h2>
+            <p>Estimate the savings gained by focusing only on truly critical vulnerabilities.</p>
+          </div>
+          <div class="section-header-right">
+            <span class="section-result-preview" id="preview-vuln"></span>
+            <span class="section-toggle-icon">▼</span>
+          </div>
+        </div>
+        <div class="section-content">
         
         <div class="input-group">
           <label class="input-label">How many workloads do you have?</label>
@@ -928,6 +1024,7 @@
           </div>
           <div class="estimated-value" id="vulnEstimate">$0</div>
           <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
+        </div>
         </div>
       </div>
     </div>
@@ -983,6 +1080,45 @@
   </div>
 
   <script>
+    // Section Toggle Function
+    function toggleSection(sectionId) {
+      const section = document.getElementById('section-' + sectionId);
+      const allSections = document.querySelectorAll('.section');
+      
+      // If clicking on an already open section, don't collapse it
+      if (!section.classList.contains('collapsed')) {
+        return;
+      }
+      
+      // Collapse all other sections
+      allSections.forEach(s => {
+        if (s !== section) {
+          s.classList.add('collapsed');
+        }
+      });
+      
+      // Expand clicked section
+      section.classList.remove('collapsed');
+      
+      // Scroll to section
+      setTimeout(() => {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+    
+    // Update section preview when calculation completes
+    function updateSectionPreview(sectionId, value) {
+      const previewEl = document.getElementById('preview-' + sectionId);
+      const section = document.getElementById('section-' + sectionId);
+      if (value > 0) {
+        previewEl.textContent = '$' + value.toLocaleString();
+        section.classList.add('has-result');
+      } else {
+        previewEl.textContent = '';
+        section.classList.remove('has-result');
+      }
+    }
+    
     // MTTR Constants
     const INCIDENTS_PER_WORKLOAD_YEAR = 12;
     const INCIDENTS_PER_WORKLOAD_MONTH = 1; // Average incidents per workload per month
@@ -1162,10 +1298,18 @@
         breakdownDiv.classList.remove('calculating');
         breakdownDiv.classList.add('show');
         
+        // Update section preview
+        updateSectionPreview('consolidation', marketValueReplaced);
+        
         // Scroll to the breakdown after a short delay
         setTimeout(() => {
           breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 300);
+        
+        // Auto-expand next section after calculation
+        setTimeout(() => {
+          toggleSection('mttr');
+        }, 1500);
         
         // Update sidebar with delay
         updateSidebar();
@@ -1262,6 +1406,9 @@
           mttrShownBefore = true;
         }
         
+        // Update section preview
+        updateSectionPreview('mttr', mttrSavings);
+        
         // Update sidebar
         updateSidebar();
         
@@ -1269,6 +1416,11 @@
         setTimeout(() => {
           breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 300);
+        
+        // Auto-expand next section after calculation
+        setTimeout(() => {
+          toggleSection('vuln');
+        }, 1500);
       }, 800);
     }
     
@@ -1332,6 +1484,9 @@
         
         breakdownDiv.classList.remove('calculating');
         breakdownDiv.classList.add('show');
+        
+        // Update section preview
+        updateSectionPreview('vuln', vulnSavings);
         
         // Scroll to the breakdown after a short delay
         setTimeout(() => {
