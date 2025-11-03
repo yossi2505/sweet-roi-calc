@@ -761,19 +761,6 @@
             </div>
             
             <div class="input-group">
-              <label class="input-label">Approximate log volume per month</label>
-              <div class="helper-text">If you're not sure, you can skip this.</div>
-              <select id="logVolume" class="input input-select">
-                <option value="">Select volume...</option>
-                <option value="notsure">Not sure</option>
-                <option value="low">Low (under 100GB)</option>
-                <option value="medium">Medium (100GB–1TB)</option>
-                <option value="high">High (1–10TB)</option>
-                <option value="veryhigh">Very high (10TB+)</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
               <label class="input-label">Current CNAPP Tool Stack</label>
               <div class="helper-text">This helps us estimate the consolidation value more accurately. If not sure, you can skip this.</div>
               <div class="checkbox-grid">
@@ -1137,16 +1124,6 @@
         };
         const environmentWeight = environmentWeights[cloudEnvironment] || 1.0;
         
-        // Get log volume weight
-        const logVolume = document.getElementById('logVolume').value;
-        const logVolumeWeights = {
-          'low': 0.9,
-          'medium': 1.0,
-          'high': 1.15,
-          'veryhigh': 1.3
-        };
-        const logVolumeWeight = logVolumeWeights[logVolume] || 1.0;
-        
         // Get vendor weight (highest single vendor, not cumulative)
         const cnappCheckboxes = document.querySelectorAll('input[name="cnappTools"]:checked');
         const vendorWeights = {
@@ -1167,7 +1144,7 @@
         });
         
         // Apply weighted formula
-        marketValueReplaced = baseToolValue * workloads * environmentWeight * logVolumeWeight * vendorWeight;
+        marketValueReplaced = baseToolValue * workloads * environmentWeight * vendorWeight;
         
         // Display only the estimated value
         const estimateEl = document.getElementById('consolidationEstimate');
