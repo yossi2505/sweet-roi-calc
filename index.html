@@ -901,7 +901,7 @@
             <span class="title-emphasis">Estimated savings</span>
             <span class="title-subtext">from reducing incident resolution time.</span>
           </div>
-          <div id="mttrCalculationSteps" style="margin: 24px 0; padding: 20px; background: #f9f9f9; border-radius: 12px; text-align: left;"></div>
+          <div id="mttrCalculationSteps" style="margin: 16px 0; padding: 14px; background: #f9f9f9; border-radius: 10px; text-align: center;"></div>
           <div class="estimated-value" id="mttrEstimateValue">$0</div>
           <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
         </div>
@@ -1247,27 +1247,23 @@
         
         // Build calculation breakdown HTML
         const stepsHTML = `
-          <div class="calc-step">
+          <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
             <span class="calc-number">${monthlyIncidentsValue.toLocaleString()}</span>
-            <span class="calc-label">incidents/month</span>
+            <span class="calc-label">incidents/mo</span>
             <span class="calc-operator">×</span>
             <span class="calc-number">12</span>
-          </div>
-          <div class="calc-step">
             <span class="calc-operator">=</span>
             <span class="calc-number">${annualIncidents.toLocaleString()}</span>
-            <span class="calc-label">annual incidents</span>
+            <span class="calc-label">incidents/year</span>
           </div>
-          <div class="calc-step" style="margin-top: 20px;">
+          <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
             <span class="calc-number">${hoursSaved.toLocaleString()}</span>
-            <span class="calc-label">hours saved (3h → 5min per incident)</span>
-          </div>
-          <div class="calc-step">
+            <span class="calc-label">hrs saved</span>
             <span class="calc-operator">×</span>
             <span class="calc-number">$${hourlyRate}</span>
-            <span class="calc-label">per hour</span>
+            <span class="calc-label">/hr</span>
           </div>
-          <div class="calc-equals">= Annual Savings</div>
+          <div style="font-size: 13px; color: var(--muted); margin-bottom: 8px;">MTTR: 3h → 5min per incident</div>
         `;
         
         document.getElementById('mttrCalculationSteps').innerHTML = stepsHTML;
