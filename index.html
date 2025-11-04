@@ -24,17 +24,14 @@
     <div class="calculator-sections">
       
       <!-- Section 0: Your Details -->
-      <div class="section" id="section-details">
-        <div class="section-header" onclick="toggleSection('details')">
+      <div class="section section-always-open" id="section-details">
+        <div class="section-header-static">
           <div class="section-header-left">
             <h2>Your Details</h2>
             <p>Tell us about your organization to get personalized ROI estimates.</p>
           </div>
-          <div class="section-header-right">
-            <span class="section-toggle-icon">▴</span>
-          </div>
         </div>
-        <div class="section-content">
+        <div class="section-content-static">
         
           <!-- Main Workloads Input -->
           <div class="input-group">
@@ -102,6 +99,11 @@
                 </div>
               </div>
             </div>
+          </div>
+          
+          <!-- Next Button -->
+          <div style="text-align: right; margin-top: 20px;">
+            <button class="next-section-btn-primary" onclick="toggleSection('consolidation')">Next: Tool Consolidation →</button>
           </div>
           
         </div>

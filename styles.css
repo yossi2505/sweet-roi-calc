@@ -202,6 +202,20 @@ body {
   opacity: 0;
 }
 
+/* Always-open section (Your Details) */
+.section-always-open {
+  overflow: visible;
+}
+
+.section-header-static {
+  padding: 20px 24px;
+  background: white;
+}
+
+.section-content-static {
+  padding: 0 24px 24px;
+}
+
 /* =========================
    Form Inputs
    ========================= */
@@ -588,6 +602,29 @@ input[type="number"] {
 }
 
 .next-section-btn:active {
+  transform: translateX(0);
+}
+
+.next-section-btn-primary {
+  background: var(--sweet-neon);
+  color: var(--ink);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(194, 255, 0, 0.2);
+}
+
+.next-section-btn-primary:hover {
+  transform: translateX(3px);
+  box-shadow: 0 4px 12px rgba(194, 255, 0, 0.35);
+}
+
+.next-section-btn-primary:active {
   transform: translateX(0);
 }
 
