@@ -107,6 +107,7 @@ function syncWorkloads(sourceValue) {
   workloadsMTTR.value = sourceValue;
   workloadsVuln.value = sourceValue;
   updateMonthlyIncidents();
+  updateEstimatedVulns(); // Auto-update vulnerability estimate
   updateConsolidationButton();
 }
 
@@ -325,9 +326,15 @@ function calculateMTTRSavings() {
  * Update estimated vulnerabilities based on workloads
  */
 function updateEstimatedVulns() {
-  const workloads = parseInt(document.getElementById('workloadsVuln').value) || 0;
-  const estimated = Math.round(workloads * VULN_CONFIG.VULNS_PER_WORKLOAD);
-  document.getElementById('vulnEstimated').value = estimated;
+  const workloadsVulnInput = document.getElementById('workloadsVuln');
+  const vulnEstimatedInput = document.getElementById('vulnEstimated');
+  
+  // If vulnEstimated is in readonly mode, auto-calculate from workloads
+  if (vulnEstimatedInput.hasAttribute('readonly')) {
+    const workloads = parseInt(workloadsVulnInput.value) || 0;
+    const estimated = Math.round(workloads * VULN_CONFIG.VULNS_PER_WORKLOAD);
+    vulnEstimatedInput.value = estimated;
+  }
 }
 
 /**

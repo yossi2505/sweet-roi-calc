@@ -124,19 +124,7 @@ body {
 }
 
 .section-result-preview {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--sweet-neon);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.section.collapsed .section-result-preview {
-  opacity: 1;
-}
-
-.section.collapsed.has-result .section-result-preview {
-  opacity: 1;
+  display: none;
 }
 
 .section-toggle-icon {
@@ -889,10 +877,10 @@ input[type="number"] {
 }
 
 .vuln-highlight-green {
-  color: var(--sweet-neon);
+  color: var(--ink);
   font-weight: 700;
   padding: 2px 6px;
-  background: rgba(194, 255, 0, 0.1);
+  background: #f0f0f0;
   border-radius: 4px;
 }
 
