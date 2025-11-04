@@ -13,7 +13,6 @@ import {
 // =========================
 // State Management
 // =========================
-let selectedTools = new Set();
 let marketValueReplaced = 0;
 let mttrSavings = 0;
 let vulnSavings = 0;
@@ -116,41 +115,24 @@ function syncWorkloads(sourceValue) {
 // =========================
 
 /**
- * Initialize tool card click handlers
- */
-function initializeToolSelection() {
-  document.querySelectorAll('.tool-card').forEach(card => {
-    card.addEventListener('click', function() {
-      const tool = this.dataset.tool;
-      
-      if (selectedTools.has(tool)) {
-        selectedTools.delete(tool);
-        this.classList.remove('selected');
-      } else {
-        selectedTools.add(tool);
-        this.classList.add('selected');
-      }
-      
-      updateConsolidationButton();
-    });
-  });
-}
-
-/**
  * Update consolidation button state based on inputs
  */
 function updateConsolidationButton() {
   const btn = document.getElementById('consolidationBtn');
   const workloads = parseInt(workloadsInput.value) || 0;
+  const securityTools = document.getElementById('securityTools').value.trim();
   
-  if (selectedTools.size > 0 && workloads > 0) {
+  if (securityTools.length > 0 && workloads > 0) {
     btn.disabled = false;
-    btn.textContent = 'Calculate';
+    btn.textContent = 'Calculate Estimated Savings';
   } else {
     btn.disabled = true;
-    btn.textContent = 'Select tools and enter workloads';
+    btn.textContent = 'Enter workloads and security tools';
   }
 }
+
+// Make function globally accessible
+window.updateConsolidationButton = updateConsolidationButton;
 
 // =========================
 // Tool Consolidation Calculator
@@ -161,8 +143,9 @@ function updateConsolidationButton() {
  */
 function calculateConsolidation() {
   const workloads = parseInt(workloadsInput.value) || 0;
+  const securityToolsInput = document.getElementById('securityTools').value.trim();
   
-  if (selectedTools.size === 0 || workloads === 0) return;
+  if (!securityToolsInput || workloads === 0) return;
   
   // Add calculating state and show spinner
   const breakdownDiv = document.getElementById('consolidationBreakdown');
@@ -175,13 +158,13 @@ function calculateConsolidation() {
     // Hide spinner
     spinner.classList.remove('show');
     
-    // Calculate base tool value (sum of data-price attributes)
-    let baseToolValue = 0;
-    selectedTools.forEach(tool => {
-      const card = document.querySelector(`[data-tool="${tool}"]`);
-      const price = parseInt(card.dataset.price);
-      baseToolValue += price;
-    });
+    // Count number of tools entered (split by comma)
+    const toolsList = securityToolsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    const toolCount = toolsList.length;
+    
+    // Base value per tool (average across all tool types)
+    const averageToolPrice = 110; // Average of old prices: (150+100+80+120+110+90+130+140)/8
+    let baseToolValue = toolCount * averageToolPrice;
     
     // Get environment weight
     const cloudEnvironment = document.getElementById('cloudEnvironment').value;
@@ -645,7 +628,6 @@ function initializeEventListeners() {
  * Initialize the calculator on page load
  */
 function init() {
-  initializeToolSelection();
   initializeEventListeners();
   // Don't set default values - let user fill them in
   // syncWorkloads will be called when user inputs a value
