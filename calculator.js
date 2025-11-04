@@ -273,25 +273,14 @@ function calculateMTTRSavings() {
     // Calculate savings
     mttrSavings = currentCost - sweetCost;
     
-    // Build calculation breakdown HTML
+    // Build compact calculation explanation
     const stepsHTML = `
-      <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
-        <span class="calc-number">${monthlyIncidentsValue.toLocaleString()}</span>
-        <span class="calc-label">incidents/mo</span>
-        <span class="calc-operator">×</span>
-        <span class="calc-number">12</span>
-        <span class="calc-operator">=</span>
-        <span class="calc-number">${annualIncidents.toLocaleString()}</span>
-        <span class="calc-label">incidents/year</span>
+      <div style="font-size: 14px; color: var(--muted); line-height: 1.6; text-align: center;">
+        Reducing MTTR from <strong style="color: var(--ink);">3 hours to 5 minutes</strong> across 
+        <strong style="color: var(--ink);">${annualIncidents.toLocaleString()} annual incidents</strong> 
+        saves <strong style="color: var(--sweet-neon);">${hoursSaved.toLocaleString()} hours</strong> 
+        @ $${hourlyRate}/hr.
       </div>
-      <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
-        <span class="calc-number">${hoursSaved.toLocaleString()}</span>
-        <span class="calc-label">hrs saved</span>
-        <span class="calc-operator">×</span>
-        <span class="calc-number">$${hourlyRate}</span>
-        <span class="calc-label">/hr</span>
-      </div>
-      <div style="font-size: 13px; color: var(--muted); margin-bottom: 8px;">MTTR: 3h → 5min per incident</div>
     `;
     
     document.getElementById('mttrCalculationSteps').innerHTML = stepsHTML;
