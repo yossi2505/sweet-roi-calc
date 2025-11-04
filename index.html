@@ -39,7 +39,8 @@
           <!-- Main Workloads Input -->
           <div class="input-group">
             <label class="input-label">Number of workloads in your organization</label>
-            <input type="number" id="workloads" class="input" placeholder="800" min="1" value="800">
+            <div class="helper-text">Count all containers, VMs, serverless functions, and other cloud resources.</div>
+            <input type="number" id="workloads" class="input" placeholder="e.g., 500" min="1">
           </div>
           
           <!-- Collapsible Additional Details -->
@@ -203,11 +204,11 @@
           <div class="findings-inputs">
             <div class="input-group">
               <label class="input-label">Workloads</label>
-              <input type="number" id="workloadsMTTR" class="input" value="800" min="1">
+              <input type="number" id="workloadsMTTR" class="input" min="1">
             </div>
             <div class="input-group">
               <label class="input-label">Monthly security incidents</label>
-              <input type="number" id="monthlyIncidents" class="input" value="4000" min="1">
+              <input type="number" id="monthlyIncidents" class="input" min="1">
             </div>
             <div class="input-group">
               <label class="input-label">Analyst hourly rate ($)</label>
@@ -254,13 +255,13 @@
           <!-- Vulnerability Inputs -->
           <div class="input-group">
             <label class="input-label">How many workloads do you have?</label>
-            <input type="number" id="workloadsVuln" class="input" value="800" min="1" oninput="updateEstimatedVulns()">
+            <input type="number" id="workloadsVuln" class="input" min="1" oninput="updateEstimatedVulns()">
           </div>
           
           <div class="input-group">
             <label class="input-label" style="font-weight: 400; color: var(--muted);">Based on customer benchmarks, we estimate you have approximately:</label>
             <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="number" id="vulnEstimated" class="input" value="8400" min="1" readonly style="max-width: 150px;">
+              <input type="number" id="vulnEstimated" class="input" min="1" readonly style="max-width: 150px;">
               <button type="button" class="manual-edit-btn" id="manualEditBtn" onclick="toggleManualVulnEdit()">Enter manually</button>
             </div>
           </div>

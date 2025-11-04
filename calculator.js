@@ -574,8 +574,8 @@ function initializeEventListeners() {
 function init() {
   initializeToolSelection();
   initializeEventListeners();
-  syncWorkloads(workloadsInput.value);
-  updateMonthlyIncidents();
+  // Don't set default values - let user fill them in
+  // syncWorkloads will be called when user inputs a value
 }
 
 // Run initialization when DOM is ready
