@@ -163,8 +163,10 @@ function calculateConsolidation() {
   
   if (selectedTools.size === 0 || workloads === 0) return;
   
-  // Show spinner
+  // Add calculating state and show spinner
+  const breakdownDiv = document.getElementById('consolidationBreakdown');
   const spinner = document.getElementById('consolidationSpinner');
+  breakdownDiv.classList.add('calculating');
   spinner.classList.add('show');
   
   // Delay calculation for suspense
@@ -199,10 +201,33 @@ function calculateConsolidation() {
     // Apply weighted formula
     marketValueReplaced = baseToolValue * workloads * environmentWeight * vendorWeight;
     
+    // Display only the estimated value
+    const estimateEl = document.getElementById('consolidationEstimate');
+    estimateEl.classList.add('animating');
+    estimateEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
+    setTimeout(() => estimateEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
+    
+    // Add pop-in animation to title only on first show
+    if (!consolidationShownBefore) {
+      const titleEl = document.getElementById('consolidationTitle');
+      titleEl.classList.add('animate-once');
+      consolidationShownBefore = true;
+    }
+    
+    breakdownDiv.classList.remove('calculating');
+    breakdownDiv.classList.add('show');
+    
     // Update section preview
     updateSectionPreview('consolidation', marketValueReplaced);
     
-    // Update sidebar
+    // Scroll to the breakdown after a short delay
+    setTimeout(() => {
+      const yOffset = -100;
+      const y = breakdownDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }, UI_CONFIG.SCROLL_DELAY);
+    
+    // Update sidebar with delay
     updateSidebar();
   }, UI_CONFIG.CALCULATION_DELAY);
 }
@@ -242,14 +267,64 @@ function calculateMTTRSavings() {
     const sweetTotalHours = annualIncidents * MTTR_CONFIG.SWEET_MTTR_HOURS;
     const sweetCost = sweetTotalHours * hourlyRate;
     
+    // Calculate time saved
+    const hoursSaved = currentTotalHours - sweetTotalHours;
+    
     // Calculate savings
     mttrSavings = currentCost - sweetCost;
+    
+    // Build calculation breakdown HTML
+    const stepsHTML = `
+      <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
+        <span class="calc-number">${monthlyIncidentsValue.toLocaleString()}</span>
+        <span class="calc-label">incidents/mo</span>
+        <span class="calc-operator">×</span>
+        <span class="calc-number">12</span>
+        <span class="calc-operator">=</span>
+        <span class="calc-number">${annualIncidents.toLocaleString()}</span>
+        <span class="calc-label">incidents/year</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
+        <span class="calc-number">${hoursSaved.toLocaleString()}</span>
+        <span class="calc-label">hrs saved</span>
+        <span class="calc-operator">×</span>
+        <span class="calc-number">$${hourlyRate}</span>
+        <span class="calc-label">/hr</span>
+      </div>
+      <div style="font-size: 13px; color: var(--muted); margin-bottom: 8px;">MTTR: 3h → 5min per incident</div>
+    `;
+    
+    document.getElementById('mttrCalculationSteps').innerHTML = stepsHTML;
+    
+    // Display the final value
+    const estimateEl = document.getElementById('mttrEstimateValue');
+    estimateEl.classList.add('animating');
+    estimateEl.textContent = `$${Math.round(mttrSavings).toLocaleString()}`;
+    setTimeout(() => estimateEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
+    
+    // Show breakdown
+    const breakdownDiv = document.getElementById('mttrBreakdown');
+    breakdownDiv.classList.add('show');
+    
+    // Add pop-in animation to title only on first show
+    if (!mttrShownBefore) {
+      const titleEl = document.getElementById('mttrTitle');
+      titleEl.classList.add('animate-once');
+      mttrShownBefore = true;
+    }
     
     // Update section preview
     updateSectionPreview('mttr', mttrSavings);
     
     // Update sidebar
     updateSidebar();
+    
+    // Scroll to the breakdown
+    setTimeout(() => {
+      const yOffset = -100;
+      const y = breakdownDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }, UI_CONFIG.SCROLL_DELAY);
   }, UI_CONFIG.CALCULATION_DELAY);
 }
 
@@ -296,7 +371,9 @@ function calculateVulnSavings() {
   
   // Show spinner
   const spinner = document.getElementById('vulnSpinner');
+  const breakdownDiv = document.getElementById('vulnBreakdown');
   spinner.classList.add('show');
+  breakdownDiv.classList.add('calculating');
   
   // Delay calculation for suspense
   setTimeout(() => {
@@ -305,10 +382,40 @@ function calculateVulnSavings() {
     
     // Calculate all values
     const vulnsIgnored = Math.round(vulnsBefore * VULN_CONFIG.VULN_REDUCTION_RATE);
+    const vulnsCritical = vulnsBefore - vulnsIgnored;
+    const hoursSaved = Math.round(vulnsIgnored * VULN_CONFIG.HOURS_PER_VULN);
     vulnSavings = vulnsIgnored * VULN_CONFIG.HOURS_PER_VULN * VULN_CONFIG.ENGINEER_HOURLY_COST;
+    
+    // Display main estimated value
+    const estimateEl = document.getElementById('vulnEstimate');
+    estimateEl.classList.add('animating');
+    estimateEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
+    setTimeout(() => estimateEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
+    
+    // Populate inline explanation with animated numbers
+    animateNumber('vulnFrom', vulnsBefore);
+    animateNumber('vulnTo', vulnsCritical);
+    animateNumber('vulnHoursSaved', hoursSaved);
+    
+    // Add pop-in animation to title only on first show
+    if (!vulnShownBefore) {
+      const titleEl = document.getElementById('vulnTitle');
+      titleEl.classList.add('animate-once');
+      vulnShownBefore = true;
+    }
+    
+    breakdownDiv.classList.remove('calculating');
+    breakdownDiv.classList.add('show');
     
     // Update section preview
     updateSectionPreview('vuln', vulnSavings);
+    
+    // Scroll to the breakdown after a short delay
+    setTimeout(() => {
+      const yOffset = -100;
+      const y = breakdownDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }, UI_CONFIG.SCROLL_DELAY);
     
     // Update sidebar
     updateSidebar();
