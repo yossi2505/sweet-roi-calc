@@ -39,76 +39,76 @@
             <div class="helper-text">Count all containers, VMs, serverless functions, and other cloud resources.</div>
             <input type="number" id="workloads" class="input" min="1">
           </div>
-          
-          <!-- Collapsible Additional Details -->
-          <div class="collapsible-section">
+        
+        <!-- Collapsible Additional Details -->
+        <div class="collapsible-section">
             <button type="button" class="collapsible-toggle active" id="additionalDetailsToggle" onclick="toggleAdditionalDetails()">
-              <span>Additional Details (Optional)</span>
-              <span class="toggle-icon">▼</span>
-            </button>
+            <span>Additional Details (Optional)</span>
+            <span class="toggle-icon">▼</span>
+          </button>
             <div class="collapsible-content show" id="additionalDetailsContent">
               
               <!-- Cloud Environment -->
-              <div class="input-group">
-                <label class="input-label">Where do most of your workloads run?</label>
+            <div class="input-group">
+              <label class="input-label">Where do most of your workloads run?</label>
                 <div class="helper-text">Choose the cloud or infrastructure type</div>
-                <select id="cloudEnvironment" class="input input-select">
-                  <option value="">Select environment...</option>
-                  <option value="aws">AWS</option>
-                  <option value="gcp">GCP</option>
-                  <option value="azure">Azure</option>
-                  <option value="multicloud">Multi-cloud</option>
-                  <option value="hybrid">Hybrid</option>
-                  <option value="onprem">On-prem</option>
-                </select>
-              </div>
-              
+              <select id="cloudEnvironment" class="input input-select">
+                <option value="">Select environment...</option>
+                <option value="aws">AWS</option>
+                <option value="gcp">GCP</option>
+                <option value="azure">Azure</option>
+                <option value="multicloud">Multi-cloud</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="onprem">On-prem</option>
+              </select>
+            </div>
+            
               <!-- CNAPP Tool Stack -->
-              <div class="input-group">
-                <label class="input-label">Current CNAPP Tool Stack</label>
+            <div class="input-group">
+              <label class="input-label">Current CNAPP Tool Stack</label>
                 <div class="helper-text">This helps us estimate the consolidation value more accurately. If not sure, you can skip this.</div>
-                <div class="checkbox-grid">
-                  <label class="checkbox-item">
-                    <input type="checkbox" name="cnappTools" value="wiz">
-                    <span>Wiz</span>
-                  </label>
-                  <label class="checkbox-item">
-                    <input type="checkbox" name="cnappTools" value="orca">
-                    <span>Orca Security</span>
-                  </label>
-                  <label class="checkbox-item">
-                    <input type="checkbox" name="cnappTools" value="prisma">
-                    <span>Prisma Cloud</span>
-                  </label>
-                  <label class="checkbox-item">
-                    <input type="checkbox" name="cnappTools" value="lacework">
-                    <span>Lacework</span>
-                  </label>
-                  <label class="checkbox-item">
-                    <input type="checkbox" name="cnappTools" value="sysdig">
-                    <span>Sysdig</span>
-                  </label>
-                  <label class="checkbox-item">
-                    <input type="checkbox" name="cnappTools" value="other">
-                    <span>Other</span>
-                  </label>
-                  <label class="checkbox-item">
-                    <input type="checkbox" name="cnappTools" value="none">
-                    <span>None</span>
-                  </label>
-                </div>
+              <div class="checkbox-grid">
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="wiz">
+                  <span>Wiz</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="orca">
+                  <span>Orca Security</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="prisma">
+                  <span>Prisma Cloud</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="lacework">
+                  <span>Lacework</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="sysdig">
+                  <span>Sysdig</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="other">
+                  <span>Other</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="cnappTools" value="none">
+                  <span>None</span>
+                </label>
               </div>
             </div>
           </div>
-          
+        </div>
+        
           <!-- Next Button -->
           <div style="text-align: right; margin-top: 20px;">
             <button class="next-section-btn-primary" onclick="toggleSection('consolidation')">Next: Tool Consolidation →</button>
           </div>
           
         </div>
-      </div>
-      
+          </div>
+          
       <!-- Section 1: Tool Consolidation -->
       <div class="section collapsed" id="section-consolidation">
         <div class="section-header" onclick="toggleSection('consolidation')">
@@ -123,52 +123,35 @@
         </div>
         <div class="section-content">
         
-          <!-- Security Tools Selection -->
-          <label class="input-label">Select the security tools you currently use:</label>
-          <div class="tools-grid" id="toolsGrid">
-            <div class="tool-card" data-tool="Runtime Security" data-price="150">
-              <div class="tool-name">Runtime Security</div>
-              <div class="tool-desc">CWPP & Real-Time Monitoring</div>
-            </div>
-            
-            <div class="tool-card" data-tool="CSPM" data-price="100">
-              <div class="tool-name">Cloud Security Posture</div>
-              <div class="tool-desc">CSPM & Configuration Management</div>
-            </div>
-            
-            <div class="tool-card" data-tool="CIEM" data-price="80">
-              <div class="tool-name">Identity Management</div>
-              <div class="tool-desc">CIEM & Identity Protection</div>
-            </div>
-            
-            <div class="tool-card" data-tool="DSPM" data-price="120">
-              <div class="tool-name">Data Security</div>
-              <div class="tool-desc">DSPM & Data Protection</div>
-            </div>
-            
-            <div class="tool-card" data-tool="API" data-price="110">
-              <div class="tool-name">API Security</div>
-              <div class="tool-desc">API Discovery & Protection</div>
-            </div>
-            
-            <div class="tool-card" data-tool="VM" data-price="90">
-              <div class="tool-name">Vulnerability Management</div>
-              <div class="tool-desc">VM & Prioritization</div>
-            </div>
-            
-            <div class="tool-card" data-tool="CDR" data-price="130">
-              <div class="tool-name">Detection & Response</div>
-              <div class="tool-desc">CDR & SIEM Integration</div>
-            </div>
-            
-            <div class="tool-card" data-tool="AI" data-price="140">
-              <div class="tool-name">AI/ML Security</div>
-              <div class="tool-desc">Model & Pipeline Protection</div>
-            </div>
+          <!-- CNAPP Usage Question -->
+          <div class="input-group">
+            <label class="input-label">Do you currently use a CNAPP solution in your organization?</label>
+            <select id="hasCNAPP" class="input" onchange="toggleCNAPPVendor()">
+              <option value="">Select an option</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          
+          <!-- CNAPP Vendor Selection (shown only if Yes) -->
+          <div class="input-group" id="cnappVendorGroup" style="display: none;">
+            <label class="input-label">Which CNAPP vendor are you currently using?</label>
+            <select id="cnappVendor" class="input" onchange="updateConsolidationButton()">
+              <option value="">Select vendor</option>
+              <option value="wiz">Wiz</option>
+              <option value="orca">Orca Security</option>
+              <option value="prisma">Prisma Cloud (Palo Alto)</option>
+              <option value="lacework">Lacework</option>
+              <option value="sysdig">Sysdig</option>
+              <option value="crowdstrike">CrowdStrike Falcon</option>
+              <option value="trend">Trend Micro</option>
+              <option value="aqua">Aqua Security</option>
+              <option value="other">Other</option>
+            </select>
           </div>
           
           <!-- Calculate Button -->
-          <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Estimated Savings</button>
+          <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()" disabled>Calculate Estimated Savings</button>
           
           <!-- Loading Spinner -->
           <div class="loading-spinner" id="consolidationSpinner"></div>
@@ -180,20 +163,20 @@
               <span class="title-subtext">based on proven consolidation results with Sweet.</span>
             </div>
             <div class="estimated-value" id="consolidationEstimate">$0</div>
-            <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Want a more precise estimation?</button>
+            <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Refine your estimation</button>
             <div style="text-align: right; margin-top: 12px;">
               <button class="next-section-btn" onclick="toggleSection('mttr')">Next: MTTR Calculator →</button>
             </div>
           </div>
-        </div>
+          </div>
       </div>
       
       <!-- Section 2: MTTR Reduction -->
       <div class="section collapsed" id="section-mttr">
         <div class="section-header" onclick="toggleSection('mttr')">
           <div class="section-header-left">
-            <h2>MTTR Reduction Value Calculator</h2>
-            <p>Calculate analyst time saved by reducing Mean Time To Resolve (MTTR) from industry average to Sweet's optimized response time.</p>
+        <h2>MTTR Reduction Value Calculator</h2>
+        <p>Calculate analyst time saved by reducing Mean Time To Resolve (MTTR) from industry average to Sweet's optimized response time.</p>
           </div>
           <div class="section-header-right">
             <span class="section-result-preview" id="preview-mttr"></span>
@@ -203,21 +186,21 @@
         <div class="section-content">
         
           <!-- MTTR Inputs -->
-          <div class="findings-inputs">
-            <div class="input-group">
-              <label class="input-label">Workloads</label>
+        <div class="findings-inputs">
+          <div class="input-group">
+            <label class="input-label">Workloads</label>
               <input type="number" id="workloadsMTTR" class="input" min="1">
-            </div>
-            <div class="input-group">
-              <label class="input-label">Monthly security incidents</label>
-              <input type="number" id="monthlyIncidents" class="input" min="1">
-            </div>
-            <div class="input-group">
-              <label class="input-label">Analyst hourly rate ($)</label>
-              <input type="number" id="hourlyRateMTTR" class="input" value="35" min="0">
-            </div>
           </div>
-          
+          <div class="input-group">
+            <label class="input-label">Monthly security incidents</label>
+              <input type="number" id="monthlyIncidents" class="input" min="1">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Analyst hourly rate ($)</label>
+            <input type="number" id="hourlyRateMTTR" class="input" value="35" min="0">
+          </div>
+        </div>
+        
           <!-- Calculate Button -->
           <button class="calculate-btn" id="mttrBtn" onclick="calculateMTTRSavings()">Calculate MTTR Reduction Value</button>
           
@@ -232,7 +215,7 @@
             </div>
             <div id="mttrCalculationSteps" style="margin: 12px 0;"></div>
             <div class="estimated-value" id="mttrEstimateValue">$0</div>
-            <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Want a more precise estimation?</button>
+            <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Refine your estimation</button>
             <div style="text-align: right; margin-top: 12px;">
               <button class="next-section-btn" onclick="toggleSection('vuln')">Next: Vulnerability ROI →</button>
             </div>
@@ -291,7 +274,7 @@
               that would take SecOps teams to remediate.
             </div>
             
-            <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Want a more precise estimation?</button>
+            <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Refine your estimation</button>
           </div>
         </div>
       </div>

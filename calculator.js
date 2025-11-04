@@ -6,14 +6,13 @@
 import { 
   MTTR_CONFIG, 
   VULN_CONFIG, 
-  CONSOLIDATION_WEIGHTS, 
+  CONSOLIDATION_CONFIG, 
   UI_CONFIG 
 } from './config.js';
 
 // =========================
 // State Management
 // =========================
-let selectedTools = new Set();
 let marketValueReplaced = 0;
 let mttrSavings = 0;
 let vulnSavings = 0;
@@ -112,28 +111,27 @@ function syncWorkloads(sourceValue) {
 }
 
 // =========================
-// Tool Selection
+// CNAPP Vendor Selection
 // =========================
 
 /**
- * Initialize tool card click handlers
+ * Toggle CNAPP vendor dropdown visibility
  */
-function initializeToolSelection() {
-  document.querySelectorAll('.tool-card').forEach(card => {
-    card.addEventListener('click', function() {
-      const tool = this.dataset.tool;
-      
-      if (selectedTools.has(tool)) {
-        selectedTools.delete(tool);
-        this.classList.remove('selected');
-      } else {
-        selectedTools.add(tool);
-        this.classList.add('selected');
-      }
-      
-      updateConsolidationButton();
-    });
-  });
+function toggleCNAPPVendor() {
+  const hasCNAPP = document.getElementById('hasCNAPP').value;
+  const vendorGroup = document.getElementById('cnappVendorGroup');
+  const cnappVendor = document.getElementById('cnappVendor');
+  
+  if (hasCNAPP === 'yes') {
+    vendorGroup.style.display = 'block';
+  } else if (hasCNAPP === 'no') {
+    vendorGroup.style.display = 'none';
+    cnappVendor.value = '';
+  } else {
+    vendorGroup.style.display = 'none';
+  }
+  
+  updateConsolidationButton();
 }
 
 /**
@@ -142,27 +140,37 @@ function initializeToolSelection() {
 function updateConsolidationButton() {
   const btn = document.getElementById('consolidationBtn');
   const workloads = parseInt(workloadsInput.value) || 0;
+  const hasCNAPP = document.getElementById('hasCNAPP').value;
+  const cnappVendor = document.getElementById('cnappVendor').value;
   
-  if (selectedTools.size > 0 && workloads > 0) {
+  // Enable button only if: workloads entered AND (no CNAPP OR vendor selected)
+  if (workloads > 0 && (hasCNAPP === 'no' || (hasCNAPP === 'yes' && cnappVendor))) {
     btn.disabled = false;
-    btn.textContent = 'Calculate';
+    btn.textContent = 'Calculate Estimated Savings';
   } else {
     btn.disabled = true;
-    btn.textContent = 'Select tools and enter workloads';
+    btn.textContent = 'Complete all fields above';
   }
 }
+
+// Make functions globally accessible
+window.toggleCNAPPVendor = toggleCNAPPVendor;
+window.updateConsolidationButton = updateConsolidationButton;
 
 // =========================
 // Tool Consolidation Calculator
 // =========================
 
 /**
- * Calculate tool consolidation ROI using weighted formula
+ * Calculate tool consolidation ROI based on CNAPP vendor and workloads
+ * Formula: workloads × vendorCoefficient × BASE_RATE_PER_WORKLOAD
  */
 function calculateConsolidation() {
   const workloads = parseInt(workloadsInput.value) || 0;
+  const hasCNAPP = document.getElementById('hasCNAPP').value;
+  const cnappVendor = document.getElementById('cnappVendor').value;
   
-  if (selectedTools.size === 0 || workloads === 0) return;
+  if (workloads === 0) return;
   
   // Add calculating state and show spinner
   const breakdownDiv = document.getElementById('consolidationBreakdown');
@@ -175,37 +183,29 @@ function calculateConsolidation() {
     // Hide spinner
     spinner.classList.remove('show');
     
-    // Calculate base tool value (sum of data-price attributes)
-    let baseToolValue = 0;
-    selectedTools.forEach(tool => {
-      const card = document.querySelector(`[data-tool="${tool}"]`);
-      const price = parseInt(card.dataset.price);
-      baseToolValue += price;
-    });
+    // If user doesn't have CNAPP, no consolidation savings
+    if (hasCNAPP === 'no') {
+      marketValueReplaced = 0;
+    } else {
+      // Get vendor coefficient
+      const vendorCoefficient = CONSOLIDATION_CONFIG.vendor[cnappVendor] || 0;
+      
+      // Calculate savings: workloads × vendorCoefficient × BASE_RATE
+      // This scales realistically: 100 workloads × 50 × 50 = $250K with top vendor
+      // 2000 workloads × 50 × 50 = $5M (but we can cap or adjust as needed)
+      marketValueReplaced = Math.round(workloads * vendorCoefficient * CONSOLIDATION_CONFIG.BASE_RATE_PER_WORKLOAD);
+    }
     
-    // Get environment weight
-    const cloudEnvironment = document.getElementById('cloudEnvironment').value;
-    const environmentWeight = CONSOLIDATION_WEIGHTS.environment[cloudEnvironment] || 
-                             CONSOLIDATION_WEIGHTS.environment.default;
-    
-    // Get vendor weight (highest single vendor, not cumulative)
-    const cnappCheckboxes = document.querySelectorAll('input[name="cnappTools"]:checked');
-    let vendorWeight = CONSOLIDATION_WEIGHTS.vendor.default;
-    cnappCheckboxes.forEach(checkbox => {
-      const weight = CONSOLIDATION_WEIGHTS.vendor[checkbox.value] || 
-                    CONSOLIDATION_WEIGHTS.vendor.default;
-      if (weight > vendorWeight) {
-        vendorWeight = weight;
-      }
-    });
-    
-    // Apply weighted formula
-    marketValueReplaced = baseToolValue * workloads * environmentWeight * vendorWeight;
-    
-    // Display only the estimated value
+    // Display the estimated value
     const estimateEl = document.getElementById('consolidationEstimate');
     estimateEl.classList.add('animating');
-    estimateEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
+    
+    if (marketValueReplaced === 0) {
+      estimateEl.textContent = '$0';
+    } else {
+      estimateEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
+    }
+    
     setTimeout(() => estimateEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
     
     // Add pop-in animation to title only on first show
@@ -645,7 +645,6 @@ function initializeEventListeners() {
  * Initialize the calculator on page load
  */
 function init() {
-  initializeToolSelection();
   initializeEventListeners();
   // Don't set default values - let user fill them in
   // syncWorkloads will be called when user inputs a value
