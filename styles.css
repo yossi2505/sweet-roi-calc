@@ -149,8 +149,8 @@ body {
 }
 
 .section h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
+  font-family: 'Inter', serif;
+  font-size: 20px;
   font-weight: 700;
   margin: 0 0 8px;
   color: var(--ink);
@@ -465,7 +465,7 @@ input[type="number"] {
   background: #fafafa;
   border: none;
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 24px 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -473,7 +473,7 @@ input[type="number"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 70px;
 }
 
 .tool-card:hover {
@@ -498,8 +498,8 @@ input[type="number"] {
 }
 
 .tool-name {
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 400;
+  font-size: 16px;
   color: var(--ink);
   text-align: center;
   margin: 0;
