@@ -510,6 +510,14 @@ function updateSidebar() {
   totalEl.classList.add('animating');
   totalEl.textContent = `$${Math.round(total).toLocaleString()}`;
   setTimeout(() => totalEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
+  
+  // Show download button if at least one calculation is done
+  const downloadBtn = document.getElementById('downloadReportBtn');
+  if (total > 0) {
+    downloadBtn.style.display = 'flex';
+  } else {
+    downloadBtn.style.display = 'none';
+  }
 }
 
 // =========================
@@ -638,6 +646,210 @@ function initializeEventListeners() {
 }
 
 // =========================
+// PDF Export
+// =========================
+
+/**
+ * Download ROI report as PDF
+ */
+function downloadPDF() {
+  // Create a clean HTML document for the PDF
+  const workloads = parseInt(document.getElementById('workloads').value) || 0;
+  const totalSavings = marketValueReplaced + mttrSavings + vulnSavings;
+  
+  // Get current date
+  const date = new Date().toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  
+  // Build PDF content
+  let pdfContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sweet Security ROI Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Inter', -apple-system, sans-serif; 
+      padding: 40px; 
+      max-width: 800px; 
+      margin: 0 auto;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+    .header { 
+      text-align: center; 
+      margin-bottom: 40px; 
+      padding-bottom: 30px;
+      border-bottom: 3px solid #c2ff00;
+    }
+    .header h1 { 
+      font-size: 32px; 
+      margin-bottom: 8px; 
+      color: #1a1a1a;
+    }
+    .header .subtitle { 
+      font-size: 16px; 
+      color: #666; 
+    }
+    .date { 
+      text-align: right; 
+      color: #888; 
+      font-size: 14px; 
+      margin-bottom: 30px;
+    }
+    .summary-box {
+      background: #fafffe;
+      border: 2px solid #c2ff00;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .summary-box .label {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .summary-box .total {
+      font-size: 48px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    .summary-box .period {
+      font-size: 16px;
+      color: #888;
+    }
+    .breakdown {
+      margin-top: 30px;
+    }
+    .breakdown h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #1a1a1a;
+    }
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .breakdown-item:last-child {
+      border-bottom: none;
+    }
+    .breakdown-item .name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .breakdown-item .desc {
+      font-size: 14px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .breakdown-item .value {
+      font-weight: 700;
+      font-size: 18px;
+      color: #1a1a1a;
+    }
+    .footer {
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 1px solid #e5e5e5;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+    }
+    .footer strong {
+      color: #1a1a1a;
+    }
+    @media print {
+      body { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Sweet Security ROI Report</h1>
+    <div class="subtitle">Estimated Annual Savings Analysis</div>
+  </div>
+  
+  <div class="date">Generated: ${date}</div>
+  
+  <div class="summary-box">
+    <div class="label">Total Annual Value</div>
+    <div class="total">$${totalSavings.toLocaleString()}</div>
+    <div class="period">per year</div>
+  </div>
+  
+  <div class="breakdown">
+    <h2>Savings Breakdown</h2>
+`;
+
+  // Add breakdown items if they exist
+  if (marketValueReplaced > 0) {
+    pdfContent += `
+    <div class="breakdown-item">
+      <div>
+        <div class="name">Tool Consolidation</div>
+        <div class="desc">Estimated annual savings from consolidating security tools</div>
+      </div>
+      <div class="value">$${marketValueReplaced.toLocaleString()}</div>
+    </div>
+`;
+  }
+  
+  if (mttrSavings > 0) {
+    pdfContent += `
+    <div class="breakdown-item">
+      <div>
+        <div class="name">MTTR Reduction</div>
+        <div class="desc">Savings from reducing incident response time</div>
+      </div>
+      <div class="value">$${mttrSavings.toLocaleString()}</div>
+    </div>
+`;
+  }
+  
+  if (vulnSavings > 0) {
+    pdfContent += `
+    <div class="breakdown-item">
+      <div>
+        <div class="name">Vulnerability Prioritization</div>
+        <div class="desc">Savings from automated vulnerability management</div>
+      </div>
+      <div class="value">$${vulnSavings.toLocaleString()}</div>
+    </div>
+`;
+  }
+  
+  pdfContent += `
+  </div>
+  
+  <div class="footer">
+    <p><strong>Organization Size:</strong> ${workloads.toLocaleString()} workloads</p>
+    <p style="margin-top: 20px;">This report is generated by Sweet Security's ROI Calculator based on your inputs and industry benchmarks.</p>
+  </div>
+</body>
+</html>
+`;
+
+  // Open print dialog with the PDF content
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(pdfContent);
+  printWindow.document.close();
+  
+  // Wait for content to load, then trigger print
+  setTimeout(() => {
+    printWindow.print();
+  }, 250);
+}
+
+// =========================
 // Initialization
 // =========================
 
@@ -671,3 +883,4 @@ window.calculateVulnSavings = calculateVulnSavings;
 window.toggleAdditionalDetails = toggleAdditionalDetails;
 window.openPreciseEstimate = openPreciseEstimate;
 window.redirectToDemo = redirectToDemo;
+window.downloadPDF = downloadPDF;
