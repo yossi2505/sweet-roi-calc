@@ -4,821 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sweet ROI Calculator</title>
+  
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --sweet-neon: #c2ff00;
-      --ink: #111;
-      --muted: #666;
-      --light-bg: #f8f8f8;
-      --border: #e0e0e0;
-    }
-    
-    * { box-sizing: border-box; }
-    
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0; 
-      background: #fff; 
-      color: var(--ink);
-      line-height: 1.6;
-    }
-    
-    .hero {
-      text-align: center;
-      padding: 30px 20px 20px;
-      background: linear-gradient(135deg, #fff9e6, #e7ffcf);
-    }
-    
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      margin: 0 0 8px;
-      color: var(--ink);
-    }
-    
-    .hero p {
-      font-size: 16px;
-      color: var(--muted);
-      margin: 0 0 16px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 20px 30px;
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-    }
-    
-    .calculator-sections {
-      flex: 2;
-    }
-    
-    .section {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      margin-bottom: 20px;
-      margin-top: -15px;
-      position: relative;
-      z-index: 2;
-      overflow: hidden;
-    }
-    
-    .section:first-child {
-      margin-top: -25px;
-    }
-    
-    .section-header {
-      padding: 20px 24px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: white;
-      transition: all 0.2s;
-      border-bottom: 2px solid transparent;
-    }
-    
-    .section-header:hover {
-      background: #fafafa;
-    }
-    
-    .section.collapsed .section-header {
-      border-bottom: 2px solid var(--border);
-    }
-    
-    .section-header-left {
-      flex: 1;
-    }
-    
-    .section-header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    
-    .section-result-preview {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--sweet-neon);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .section.collapsed .section-result-preview {
-      opacity: 1;
-    }
-    
-    .section.collapsed.has-result .section-result-preview {
-      opacity: 1;
-    }
-    
-    .section-toggle-icon {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      color: #999;
-      font-size: 11px;
-      opacity: 0.6;
-    }
-    
-    .section-header:hover .section-toggle-icon {
-      opacity: 1;
-      color: var(--ink);
-    }
-    
-    .section.collapsed .section-toggle-icon {
-      transform: rotate(180deg);
-    }
-    
-    .section h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      margin: 0 0 8px;
-      color: var(--ink);
-      line-height: 1.3;
-    }
-    
-    .section p {
-      color: var(--muted);
-      margin: 0;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    
-    .section-content {
-      padding: 0 24px 24px;
-      max-height: 5000px;
-      overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.4s ease;
-    }
-    
-    .section.collapsed .section-content {
-      max-height: 0;
-      padding: 0 24px;
-    }
-    
-    .input-group {
-      margin-bottom: 20px;
-    }
-    
-    .input-label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--ink);
-      font-size: 14px;
-      line-height: 1.4;
-    }
-    
-    .helper-text {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 10px;
-      line-height: 1.5;
-    }
-    
-    .input {
-      width: 100%;
-      max-width: 180px;
-      padding: 12px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      background: white;
-      transition: all 0.2s;
-    }
-    
-    .input-select {
-      max-width: 100%;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    
-    .input:focus {
-      outline: none;
-      border-color: var(--sweet-neon);
-      box-shadow: 0 0 0 3px rgba(194, 255, 0, 0.1);
-    }
-    
-    .input:read-only {
-      background: #f5f5f5;
-      color: var(--muted);
-    }
-    
-    /* Remove number input arrows/spinners */
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    
-    input[type="number"] {
-      -moz-appearance: textfield;
-    }
-    
-    /* Collapsible Section */
-    .collapsible-section {
-      margin-bottom: 20px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    
-    .collapsible-toggle {
-      width: 100%;
-      padding: 12px 16px;
-      background: var(--light-bg);
-      border: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--ink);
-      transition: all 0.2s;
-    }
-    
-    .collapsible-toggle:hover {
-      background: #efefef;
-    }
-    
-    .toggle-icon {
-      transition: transform 0.3s ease;
-      font-size: 12px;
-    }
-    
-    .collapsible-toggle.active .toggle-icon {
-      transform: rotate(180deg);
-    }
-    
-    .collapsible-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      background: white;
-    }
-    
-    .collapsible-content.show {
-      max-height: 1000px;
-      padding: 16px;
-    }
-    
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 10px;
-    }
-    
-    .checkbox-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      color: var(--ink);
-      line-height: 1.4;
-    }
-    
-    .checkbox-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      accent-color: var(--sweet-neon);
-    }
-    
-    .checkbox-item:hover {
-      color: var(--sweet-neon);
-    }
-    
-    .manual-edit-btn {
-      padding: 8px 16px;
-      background: white;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--ink);
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    
-    .manual-edit-btn:hover {
-      border-color: var(--sweet-neon);
-      color: var(--sweet-neon);
-    }
-    
-    .manual-edit-btn.editing {
-      background: var(--sweet-neon);
-      border-color: var(--sweet-neon);
-      color: var(--ink);
-    }
-    
-    .calc-step {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    
-    .calc-step:last-child {
-      margin-bottom: 0;
-    }
-    
-    .calc-number {
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--ink);
-    }
-    
-    .calc-label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-    
-    .calc-operator {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--muted);
-      margin: 0 6px;
-    }
-    
-    .calc-equals {
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--sweet-neon);
-      margin: 12px 0;
-      text-align: center;
-    }
-    
-    /* Gray background for workload inputs */
-    #workloadsFindings, #workloadsMTTR, #monthlyIncidents {
-      background: #f5f5f5;
-      color: var(--ink);
-    }
-    
-    #workloadsFindings:focus, #workloadsMTTR:focus, #monthlyIncidents:focus {
-      background: #f0f0f0;
-    }
-    
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-      margin-top: 12px;
-      margin-bottom: 24px;
-    }
-    
-    .tool-card {
-      background: var(--light-bg);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      padding: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-    
-    .tool-card:hover {
-      border-color: var(--sweet-neon);
-      transform: translateY(-2px);
-    }
-    
-    .tool-card.selected {
-      border-color: var(--sweet-neon);
-      background: #f0fff0;
-    }
-    
-    .tool-card.selected::after {
-      content: '✓';
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      color: var(--sweet-neon);
-      font-weight: bold;
-      font-size: 18px;
-    }
-    
-    .tool-name {
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--ink);
-      line-height: 1.3;
-    }
-    
-    .tool-desc {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      line-height: 1.4;
-    }
-    
-    .tool-price {
-      font-weight: 700;
-      color: var(--ink);
-      font-size: 16px;
-    }
-    
-    .calculate-btn {
-      background: var(--sweet-neon);
-      color: var(--ink);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 12px;
-    }
-    
-    .calculate-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(194, 255, 0, 0.3);
-    }
-    
-    .calculate-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .calculation-breakdown {
-      margin-top: 16px;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 10px;
-      border-left: 4px solid var(--sweet-neon);
-      display: none;
-      animation: slideIn 0.3s ease-out;
-      text-align: center;
-    }
-    
-    .calculation-breakdown.show {
-      display: block;
-    }
-    
-    .estimated-value {
-      font-size: 36px;
-      font-weight: 900;
-      color: var(--ink);
-      margin: 16px 0;
-    }
-    
-    .precision-cta {
-      margin-top: 16px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes countUp {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    
-    .animating {
-      animation: countUp 0.4s ease-out;
-    }
-    
-    .calculating {
-      opacity: 0.3;
-      transition: opacity 0.2s;
-    }
-    
-    .loading-spinner {
-      display: none;
-      width: 50px;
-      height: 50px;
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid var(--sweet-neon);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 24px auto;
-    }
-    
-    .loading-spinner.show {
-      display: block;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .breakdown-title {
-      font-weight: 700;
-      font-size: 16px;
-      line-height: 1.4;
-      margin-bottom: 10px;
-      color: var(--ink);
-    }
-    
-    .breakdown-title.animate-once {
-      animation: popIn 0.6s ease-out;
-    }
-    
-    .title-emphasis {
-      display: block;
-      font-size: 32px;
-      font-weight: 900;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
-    
-    .title-subtext {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-    }
-    
-    @keyframes popIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      50% {
-        transform: scale(1.05);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    
-    .breakdown-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-    
-    .breakdown-label {
-      color: var(--muted);
-    }
-    
-    .breakdown-value {
-      font-weight: 600;
-      color: var(--ink);
-    }
-    
-    .breakdown-total {
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
-      margin-top: 8px;
-      font-weight: 700;
-      font-size: 16px;
-    }
-    
-    .breakdown-total .breakdown-value {
-      color: var(--sweet-neon);
-      font-size: 18px;
-    }
-    
-    /* Sidebar Checkout Style */
-    .sidebar {
-      flex: 1;
-      background: var(--ink);
-      color: white;
-      border-radius: 16px;
-      padding: 20px;
-      position: sticky;
-      top: 15px;
-      height: fit-content;
-      min-width: 320px;
-    }
-    
-    .sidebar h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      margin: 0 0 16px;
-      color: white;
-    }
-    
-    .bill-items {
-      margin-bottom: 16px;
-    }
-    
-    .bill-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 14px 0;
-      border-bottom: 1px solid #333;
-    }
-    
-    .bill-item:last-child {
-      border-bottom: none;
-    }
-    
-    .bill-item-left {
-      flex: 1;
-    }
-    
-    .bill-item-name {
-      color: var(--sweet-neon);
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 4px;
-    }
-    
-    .bill-item-desc {
-      color: #ccc;
-      font-size: 12px;
-      margin-top: 3px;
-    }
-    
-    .bill-calculation {
-      font-size: 13px;
-      color: #ccc;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #2a2a2a;
-      line-height: 1.8;
-    }
-    
-    .bill-calc-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-    
-    .bill-calc-label {
-      color: #aaa;
-      font-size: 13px;
-    }
-    
-    .bill-calc-value {
-      color: var(--sweet-neon);
-      font-weight: 600;
-      font-size: 14px;
-    }
-    
-    .bill-calc-formula {
-      color: #888;
-      font-style: italic;
-      font-size: 12px;
-      margin-top: 6px;
-      text-align: center;
-    }
-    
-    .bill-item-value {
-      font-weight: 900;
-      font-size: 20px;
-      color: var(--sweet-neon);
-      white-space: nowrap;
-      margin-left: 12px;
-      text-shadow: 0 0 20px rgba(194, 255, 0, 0.3);
-    }
-    
-    .bill-total {
-      border-top: 2px solid var(--sweet-neon);
-      padding-top: 14px;
-      margin-top: 14px;
-    }
-    
-    .total-label {
-      font-size: 18px;
-      font-weight: 600;
-      color: white;
-    }
-    
-    .total-value {
-      font-size: 32px;
-      font-weight: 900;
-      color: var(--sweet-neon);
-      margin-top: 6px;
-    }
-    
-    .total-period {
-      color: #ccc;
-      font-size: 13px;
-      margin-top: 3px;
-    }
-    
-    .cta-button {
-      width: 100%;
-      background: var(--sweet-neon);
-      color: var(--ink);
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 16px;
-    }
-    
-    .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(194, 255, 0, 0.3);
-    }
-    
-    .assumptions {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #333;
-      font-size: 12px;
-      color: #999;
-      line-height: 1.4;
-    }
-    
-    .findings-inputs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    
-    .benchmark-list {
-      background: #f9f9f9;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-    }
-    
-    .benchmark-list h4 {
-      margin: 0 0 8px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ink);
-    }
-    
-    .benchmark-list ul {
-      margin: 0;
-      padding-left: 16px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    
-    .benchmark-list li {
-      margin-bottom: 3px;
-    }
-    
-    @media (max-width: 1200px) {
-      .container {
-        flex-direction: column;
-      }
-      
-      .sidebar {
-        position: relative;
-        top: 0;
-        min-width: auto;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 36px; }
-      .hero p { font-size: 18px; }
-      .section { padding: 24px; }
-      .tools-grid { grid-template-columns: 1fr; }
-      .findings-inputs { grid-template-columns: 1fr; }
-    }
-  </style>
+  
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Hero Section -->
   <div class="hero">
     <h1><b>ROI Calculator</b></h1>
-    <p>  <br> </p>
+    <p><br></p>
   </div>
   
+  <!-- Main Container -->
   <div class="container">
+    <!-- Calculator Sections -->
     <div class="calculator-sections">
+      
       <!-- Section 0: Your Details -->
       <div class="section" id="section-details">
         <div class="section-header" onclick="toggleSection('details')">
@@ -832,69 +36,73 @@
         </div>
         <div class="section-content">
         
-        <div class="input-group">
-          <label class="input-label">Number of workloads in your organization</label>
-          <input type="number" id="workloads" class="input" placeholder="800" min="1" value="800">
-        </div>
-        
-        <!-- Collapsible Additional Details -->
-        <div class="collapsible-section">
-          <button type="button" class="collapsible-toggle active" id="additionalDetailsToggle" onclick="toggleAdditionalDetails()">
-            <span>Additional Details (Optional)</span>
-            <span class="toggle-icon">▼</span>
-          </button>
-          <div class="collapsible-content show" id="additionalDetailsContent">
-            <div class="input-group">
-              <label class="input-label">Where do most of your workloads run?</label>
-              <div class="helper-text">Choose the cloud or infrastructure type</div>
-              <select id="cloudEnvironment" class="input input-select">
-                <option value="">Select environment...</option>
-                <option value="aws">AWS</option>
-                <option value="gcp">GCP</option>
-                <option value="azure">Azure</option>
-                <option value="multicloud">Multi-cloud</option>
-                <option value="hybrid">Hybrid</option>
-                <option value="onprem">On-prem</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
-              <label class="input-label">Current CNAPP Tool Stack</label>
-              <div class="helper-text">This helps us estimate the consolidation value more accurately. If not sure, you can skip this.</div>
-              <div class="checkbox-grid">
-                <label class="checkbox-item">
-                  <input type="checkbox" name="cnappTools" value="wiz">
-                  <span>Wiz</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="cnappTools" value="orca">
-                  <span>Orca Security</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="cnappTools" value="prisma">
-                  <span>Prisma Cloud</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="cnappTools" value="lacework">
-                  <span>Lacework</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="cnappTools" value="sysdig">
-                  <span>Sysdig</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="cnappTools" value="other">
-                  <span>Other</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="cnappTools" value="none">
-                  <span>None</span>
-                </label>
+          <!-- Main Workloads Input -->
+          <div class="input-group">
+            <label class="input-label">Number of workloads in your organization</label>
+            <input type="number" id="workloads" class="input" placeholder="800" min="1" value="800">
+          </div>
+          
+          <!-- Collapsible Additional Details -->
+          <div class="collapsible-section">
+            <button type="button" class="collapsible-toggle active" id="additionalDetailsToggle" onclick="toggleAdditionalDetails()">
+              <span>Additional Details (Optional)</span>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="collapsible-content show" id="additionalDetailsContent">
+              
+              <!-- Cloud Environment -->
+              <div class="input-group">
+                <label class="input-label">Where do most of your workloads run?</label>
+                <div class="helper-text">Choose the cloud or infrastructure type</div>
+                <select id="cloudEnvironment" class="input input-select">
+                  <option value="">Select environment...</option>
+                  <option value="aws">AWS</option>
+                  <option value="gcp">GCP</option>
+                  <option value="azure">Azure</option>
+                  <option value="multicloud">Multi-cloud</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="onprem">On-prem</option>
+                </select>
+              </div>
+              
+              <!-- CNAPP Tool Stack -->
+              <div class="input-group">
+                <label class="input-label">Current CNAPP Tool Stack</label>
+                <div class="helper-text">This helps us estimate the consolidation value more accurately. If not sure, you can skip this.</div>
+                <div class="checkbox-grid">
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="cnappTools" value="wiz">
+                    <span>Wiz</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="cnappTools" value="orca">
+                    <span>Orca Security</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="cnappTools" value="prisma">
+                    <span>Prisma Cloud</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="cnappTools" value="lacework">
+                    <span>Lacework</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="cnappTools" value="sysdig">
+                    <span>Sysdig</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="cnappTools" value="other">
+                    <span>Other</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="cnappTools" value="none">
+                    <span>None</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
+          
         </div>
       </div>
       
@@ -912,53 +120,57 @@
         </div>
         <div class="section-content">
         
-        <label class="input-label">Select the security tools you currently use:</label>
-        <div class="tools-grid" id="toolsGrid">
-          <div class="tool-card" data-tool="Runtime Security" data-price="150">
-            <div class="tool-name">Runtime Security</div>
-            <div class="tool-desc">CWPP & Real-Time Monitoring</div>
+          <!-- Security Tools Selection -->
+          <label class="input-label">Select the security tools you currently use:</label>
+          <div class="tools-grid" id="toolsGrid">
+            <div class="tool-card" data-tool="Runtime Security" data-price="150">
+              <div class="tool-name">Runtime Security</div>
+              <div class="tool-desc">CWPP & Real-Time Monitoring</div>
+            </div>
+            
+            <div class="tool-card" data-tool="CSPM" data-price="100">
+              <div class="tool-name">Cloud Security Posture</div>
+              <div class="tool-desc">CSPM & Configuration Management</div>
+            </div>
+            
+            <div class="tool-card" data-tool="CIEM" data-price="80">
+              <div class="tool-name">Identity Management</div>
+              <div class="tool-desc">CIEM & Identity Protection</div>
+            </div>
+            
+            <div class="tool-card" data-tool="DSPM" data-price="120">
+              <div class="tool-name">Data Security</div>
+              <div class="tool-desc">DSPM & Data Protection</div>
+            </div>
+            
+            <div class="tool-card" data-tool="API" data-price="110">
+              <div class="tool-name">API Security</div>
+              <div class="tool-desc">API Discovery & Protection</div>
+            </div>
+            
+            <div class="tool-card" data-tool="VM" data-price="90">
+              <div class="tool-name">Vulnerability Management</div>
+              <div class="tool-desc">VM & Prioritization</div>
+            </div>
+            
+            <div class="tool-card" data-tool="CDR" data-price="130">
+              <div class="tool-name">Detection & Response</div>
+              <div class="tool-desc">CDR & SIEM Integration</div>
+            </div>
+            
+            <div class="tool-card" data-tool="AI" data-price="140">
+              <div class="tool-name">AI/ML Security</div>
+              <div class="tool-desc">Model & Pipeline Protection</div>
+            </div>
           </div>
           
-          <div class="tool-card" data-tool="CSPM" data-price="100">
-            <div class="tool-name">Cloud Security Posture</div>
-            <div class="tool-desc">CSPM & Configuration Management</div>
-          </div>
+          <!-- Calculate Button -->
+          <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Estimated Savings</button>
           
-          <div class="tool-card" data-tool="CIEM" data-price="80">
-            <div class="tool-name">Identity Management</div>
-            <div class="tool-desc">CIEM & Identity Protection</div>
-          </div>
+          <!-- Loading Spinner -->
+          <div class="loading-spinner" id="consolidationSpinner"></div>
           
-          <div class="tool-card" data-tool="DSPM" data-price="120">
-            <div class="tool-name">Data Security</div>
-            <div class="tool-desc">DSPM & Data Protection</div>
-          </div>
-          
-          <div class="tool-card" data-tool="API" data-price="110">
-            <div class="tool-name">API Security</div>
-            <div class="tool-desc">API Discovery & Protection</div>
-          </div>
-          
-          <div class="tool-card" data-tool="VM" data-price="90">
-            <div class="tool-name">Vulnerability Management</div>
-            <div class="tool-desc">VM & Prioritization</div>
-          </div>
-          
-          <div class="tool-card" data-tool="CDR" data-price="130">
-            <div class="tool-name">Detection & Response</div>
-            <div class="tool-desc">CDR & SIEM Integration</div>
-          </div>
-          
-          <div class="tool-card" data-tool="AI" data-price="140">
-            <div class="tool-name">AI/ML Security</div>
-            <div class="tool-desc">Model & Pipeline Protection</div>
-          </div>
-        </div>
-        
-        <button class="calculate-btn" id="consolidationBtn" onclick="calculateConsolidation()">Calculate Estimated Savings</button>
-        
-        <div class="loading-spinner" id="consolidationSpinner"></div>
-        
+          <!-- Results Breakdown -->
           <div class="calculation-breakdown" id="consolidationBreakdown">
             <div class="breakdown-title" id="consolidationTitle">
               <span class="title-emphasis">Estimated savings</span>
@@ -970,7 +182,7 @@
         </div>
       </div>
       
-      <!-- Section 3: MTTR Reduction Value -->
+      <!-- Section 2: MTTR Reduction -->
       <div class="section collapsed" id="section-mttr">
         <div class="section-header" onclick="toggleSection('mttr')">
           <div class="section-header-left">
@@ -984,38 +196,42 @@
         </div>
         <div class="section-content">
         
-        <div class="findings-inputs">
-          <div class="input-group">
-            <label class="input-label">Workloads</label>
-            <input type="number" id="workloadsMTTR" class="input" value="800" min="1">
+          <!-- MTTR Inputs -->
+          <div class="findings-inputs">
+            <div class="input-group">
+              <label class="input-label">Workloads</label>
+              <input type="number" id="workloadsMTTR" class="input" value="800" min="1">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Monthly security incidents</label>
+              <input type="number" id="monthlyIncidents" class="input" value="4000" min="1">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Analyst hourly rate ($)</label>
+              <input type="number" id="hourlyRateMTTR" class="input" value="35" min="0">
+            </div>
           </div>
-          <div class="input-group">
-            <label class="input-label">Monthly security incidents</label>
-            <input type="number" id="monthlyIncidents" class="input" value="4000" min="1">
+          
+          <!-- Calculate Button -->
+          <button class="calculate-btn" id="mttrBtn" onclick="calculateMTTRSavings()">Calculate MTTR Reduction Value</button>
+          
+          <!-- Loading Spinner -->
+          <div class="loading-spinner" id="mttrSpinner"></div>
+          
+          <!-- Results Breakdown -->
+          <div class="calculation-breakdown" id="mttrBreakdown">
+            <div class="breakdown-title" id="mttrTitle">
+              <span class="title-emphasis">Estimated savings</span>
+              <span class="title-subtext">from reducing incident resolution time.</span>
+            </div>
+            <div id="mttrCalculationSteps" style="margin: 16px 0; padding: 14px; background: #f9f9f9; border-radius: 10px; text-align: center;"></div>
+            <div class="estimated-value" id="mttrEstimateValue">$0</div>
+            <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
           </div>
-          <div class="input-group">
-            <label class="input-label">Analyst hourly rate ($)</label>
-            <input type="number" id="hourlyRateMTTR" class="input" value="35" min="0">
-          </div>
-        </div>
-        
-        <button class="calculate-btn" id="mttrBtn" onclick="calculateMTTRSavings()">Calculate MTTR Reduction Value</button>
-        
-        <div class="loading-spinner" id="mttrSpinner"></div>
-        
-        <div class="calculation-breakdown" id="mttrBreakdown">
-          <div class="breakdown-title" id="mttrTitle">
-            <span class="title-emphasis">Estimated savings</span>
-            <span class="title-subtext">from reducing incident resolution time.</span>
-          </div>
-          <div id="mttrCalculationSteps" style="margin: 16px 0; padding: 14px; background: #f9f9f9; border-radius: 10px; text-align: center;"></div>
-          <div class="estimated-value" id="mttrEstimateValue">$0</div>
-          <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
-        </div>
         </div>
       </div>
       
-      <!-- Section 4: Vulnerability Prioritization ROI -->
+      <!-- Section 3: Vulnerability Prioritization -->
       <div class="section collapsed" id="section-vuln">
         <div class="section-header" onclick="toggleSection('vuln')">
           <div class="section-header-left">
@@ -1029,45 +245,51 @@
         </div>
         <div class="section-content">
         
-        <div class="input-group">
-          <label class="input-label">How many workloads do you have?</label>
-          <input type="number" id="workloadsVuln" class="input" value="800" min="1" oninput="updateEstimatedVulns()">
-        </div>
-        
-        <div class="input-group">
-          <label class="input-label" style="font-weight: 400; color: var(--muted);">Based on customer benchmarks, we estimate you have approximately:</label>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <input type="number" id="vulnEstimated" class="input" value="8400" min="1" readonly style="max-width: 150px;">
-            <button type="button" class="manual-edit-btn" id="manualEditBtn" onclick="toggleManualVulnEdit()">Enter manually</button>
+          <!-- Vulnerability Inputs -->
+          <div class="input-group">
+            <label class="input-label">How many workloads do you have?</label>
+            <input type="number" id="workloadsVuln" class="input" value="800" min="1" oninput="updateEstimatedVulns()">
           </div>
-        </div>
-        
-        <div style="padding: 12px 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px;">
-          <strong style="font-size: 14px; color: var(--ink);">Assumptions:</strong>
-          <span style="font-size: 14px; color: var(--muted);"> 10h per vulnerability × $100/hr × 99.684% reduction rate. (based on customer benchmarks)</span>
-        </div>
-        
-        <button class="calculate-btn" id="vulnBtn" onclick="calculateVulnSavings()">Calculate Vulnerability Savings</button>
-        
-        <div class="loading-spinner" id="vulnSpinner"></div>
-        
-        <div class="calculation-breakdown" id="vulnBreakdown">
-          <div class="breakdown-title" id="vulnTitle">
-            <span class="title-emphasis">Estimated savings</span>
-            <span class="title-subtext">from intelligent vulnerability prioritization.</span>
+          
+          <div class="input-group">
+            <label class="input-label" style="font-weight: 400; color: var(--muted);">Based on customer benchmarks, we estimate you have approximately:</label>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="number" id="vulnEstimated" class="input" value="8400" min="1" readonly style="max-width: 150px;">
+              <button type="button" class="manual-edit-btn" id="manualEditBtn" onclick="toggleManualVulnEdit()">Enter manually</button>
+            </div>
           </div>
-          <div class="estimated-value" id="vulnEstimate">$0</div>
-          <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
-        </div>
+          
+          <!-- Assumptions -->
+          <div style="padding: 12px 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px;">
+            <strong style="font-size: 14px; color: var(--ink);">Assumptions:</strong>
+            <span style="font-size: 14px; color: var(--muted);"> 10h per vulnerability × $100/hr × 99.684% reduction rate. (based on customer benchmarks)</span>
+          </div>
+          
+          <!-- Calculate Button -->
+          <button class="calculate-btn" id="vulnBtn" onclick="calculateVulnSavings()">Calculate Vulnerability Savings</button>
+          
+          <!-- Loading Spinner -->
+          <div class="loading-spinner" id="vulnSpinner"></div>
+          
+          <!-- Results Breakdown -->
+          <div class="calculation-breakdown" id="vulnBreakdown">
+            <div class="breakdown-title" id="vulnTitle">
+              <span class="title-emphasis">Estimated savings</span>
+              <span class="title-subtext">from intelligent vulnerability prioritization.</span>
+            </div>
+            <div class="estimated-value" id="vulnEstimate">$0</div>
+            <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- Sidebar Checkout -->
+    <!-- Sidebar (ROI Summary) -->
     <div class="sidebar">
       <h3>Your ROI Summary</h3>
       
       <div class="bill-items" id="billItems">
+        <!-- Tool Consolidation Item -->
         <div class="bill-item" id="consolidationItem" style="display: none;">
           <div class="bill-item-left">
             <div class="bill-item-name">Tool Consolidation</div>
@@ -1077,6 +299,7 @@
           <div class="bill-item-value" id="consolidationValue">$0</div>
         </div>
         
+        <!-- MTTR Reduction Item -->
         <div class="bill-item" id="mttrItem" style="display: none;">
           <div class="bill-item-left">
             <div class="bill-item-name">MTTR Reduction</div>
@@ -1086,6 +309,7 @@
           <div class="bill-item-value" id="mttrValue">$0</div>
         </div>
         
+        <!-- Vulnerability Prioritization Item -->
         <div class="bill-item" id="vulnItem" style="display: none;">
           <div class="bill-item-left">
             <div class="bill-item-name">Vulnerability Prioritization</div>
@@ -1096,14 +320,17 @@
         </div>
       </div>
       
+      <!-- Total -->
       <div class="bill-total">
         <div class="total-label">Total Annual Value</div>
         <div class="total-value" id="totalSavings">$0</div>
         <div class="total-period">per year</div>
       </div>
       
+      <!-- CTA Button -->
       <button class="cta-button" onclick="redirectToDemo()">Get Started with Sweet Security</button>
       
+      <!-- Assumptions -->
       <div class="assumptions">
         <strong>Key Assumptions:</strong><br>
         • Estimates based on industry benchmarks<br>
@@ -1113,527 +340,7 @@
     </div>
   </div>
 
-  <script>
-    // Section Toggle Function
-    function toggleSection(sectionId) {
-      const section = document.getElementById('section-' + sectionId);
-      const allSections = document.querySelectorAll('.section');
-      
-      // If clicking on an already open section, don't collapse it
-      if (!section.classList.contains('collapsed')) {
-        return;
-      }
-      
-      // Collapse all other sections
-      allSections.forEach(s => {
-        if (s !== section) {
-          s.classList.add('collapsed');
-        }
-      });
-      
-      // Expand clicked section
-      section.classList.remove('collapsed');
-      
-      // Scroll to section
-      setTimeout(() => {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-    
-    // Update section preview when calculation completes
-    function updateSectionPreview(sectionId, value) {
-      const previewEl = document.getElementById('preview-' + sectionId);
-      const section = document.getElementById('section-' + sectionId);
-      if (value > 0) {
-        previewEl.textContent = '$' + value.toLocaleString();
-        section.classList.add('has-result');
-      } else {
-        previewEl.textContent = '';
-        section.classList.remove('has-result');
-      }
-    }
-    
-    // MTTR Constants
-    const INCIDENTS_PER_WORKLOAD_YEAR = 12;
-    const INCIDENTS_PER_WORKLOAD_MONTH = 1; // Average incidents per workload per month
-    const BENCHMARK_MTTR_HOURS = 3;
-    const SWEET_MTTR_MINUTES = 5;
-    const SWEET_MTTR_HOURS = SWEET_MTTR_MINUTES / 60; // 0.0833 hours
-    
-    // Vulnerability Prioritization Constants
-    const VULNS_PER_WORKLOAD = 10.5; // Average vulnerabilities per workload
-    const HOURS_PER_VULN = 10; // Person-hours to remediate one vulnerability
-    const ENGINEER_HOURLY_COST = 100; // $/hour for SecOps/DevOps engineer
-    const VULN_REDUCTION_RATE = 0.99684; // 99.684% reduction
-    
-    let selectedTools = new Set();
-    let marketValueReplaced = 0;
-    let mttrSavings = 0;
-    let vulnSavings = 0;
-    
-    // Sync workloads between sections
-    const workloadsInput = document.getElementById('workloads');
-    const workloadsMTTR = document.getElementById('workloadsMTTR');
-    const workloadsVuln = document.getElementById('workloadsVuln');
-    const monthlyIncidents = document.getElementById('monthlyIncidents');
-    
-    // Track if user has manually changed monthly incidents
-    let userOverrodeIncidents = false;
-    
-    // Track if consolidation breakdown has been shown before
-    let consolidationShownBefore = false;
-    
-    // Track if MTTR breakdown has been shown before
-    let mttrShownBefore = false;
-    
-    // Function to update monthly incidents based on workloads
-    function updateMonthlyIncidents() {
-      if (!userOverrodeIncidents) {
-        const workloads = parseInt(workloadsMTTR.value) || 0;
-        monthlyIncidents.value = workloads * INCIDENTS_PER_WORKLOAD_MONTH;
-      }
-    }
-    
-    // Function to sync all workload fields
-    function syncWorkloads(sourceValue) {
-      workloadsInput.value = sourceValue;
-      workloadsMTTR.value = sourceValue;
-      workloadsVuln.value = sourceValue;
-      updateMonthlyIncidents();
-      updateConsolidationButton();
-    }
-    
-    workloadsInput.addEventListener('input', () => {
-      syncWorkloads(workloadsInput.value);
-      
-      // Auto-expand consolidation section when user starts filling details
-      const consolidationSection = document.getElementById('section-consolidation');
-      if (consolidationSection && consolidationSection.classList.contains('collapsed') && workloadsInput.value) {
-        setTimeout(() => {
-          toggleSection('consolidation');
-        }, 800);
-      }
-    });
-    
-    workloadsMTTR.addEventListener('input', () => {
-      syncWorkloads(workloadsMTTR.value);
-    });
-    
-    workloadsVuln.addEventListener('input', () => {
-      syncWorkloads(workloadsVuln.value);
-    });
-    
-    // Track manual changes to monthly incidents
-    monthlyIncidents.addEventListener('input', () => {
-      userOverrodeIncidents = true;
-    });
-    
-    // Reset override flag when monthly incidents is cleared
-    monthlyIncidents.addEventListener('focus', function() {
-      if (this.value === '') {
-        userOverrodeIncidents = false;
-        updateMonthlyIncidents();
-      }
-    });
-    
-    // Tool selection handling
-    document.querySelectorAll('.tool-card').forEach(card => {
-      card.addEventListener('click', function() {
-        const tool = this.dataset.tool;
-        
-        if (selectedTools.has(tool)) {
-          selectedTools.delete(tool);
-          this.classList.remove('selected');
-        } else {
-          selectedTools.add(tool);
-          this.classList.add('selected');
-        }
-        
-        updateConsolidationButton();
-      });
-    });
-    
-    function updateConsolidationButton() {
-      const btn = document.getElementById('consolidationBtn');
-      const workloads = parseInt(workloadsInput.value) || 0;
-      
-      if (selectedTools.size > 0 && workloads > 0) {
-        btn.disabled = false;
-        btn.textContent = `Calculate`;
-      } else {
-        btn.disabled = true;
-        btn.textContent = 'Select tools and enter workloads';
-      }
-    }
-    
-    function calculateConsolidation() {
-      const workloads = parseInt(workloadsInput.value) || 0;
-      
-      if (selectedTools.size === 0 || workloads === 0) return;
-      
-      // Add calculating state and show spinner
-      const breakdownDiv = document.getElementById('consolidationBreakdown');
-      const spinner = document.getElementById('consolidationSpinner');
-      breakdownDiv.classList.add('calculating');
-      spinner.classList.add('show');
-      
-      // Delay calculation for suspense (0.8 seconds)
-      setTimeout(() => {
-        // Hide spinner
-        spinner.classList.remove('show');
-        
-        // Calculate base tool value (sum of data-price attributes)
-        let baseToolValue = 0;
-        selectedTools.forEach(tool => {
-          const card = document.querySelector(`[data-tool="${tool}"]`);
-          const price = parseInt(card.dataset.price);
-          baseToolValue += price;
-        });
-        
-        // Get environment weight
-        const cloudEnvironment = document.getElementById('cloudEnvironment').value;
-        const environmentWeights = {
-          'aws': 1.15,
-          'azure': 1.10,
-          'gcp': 1.05,
-          'multicloud': 1.25,
-          'hybrid': 1.10,
-          'onprem': 0.95
-        };
-        const environmentWeight = environmentWeights[cloudEnvironment] || 1.0;
-        
-        // Get vendor weight (highest single vendor, not cumulative)
-        const cnappCheckboxes = document.querySelectorAll('input[name="cnappTools"]:checked');
-        const vendorWeights = {
-          'wiz': 1.25,
-          'orca': 1.20,
-          'prisma': 1.15,
-          'lacework': 1.10,
-          'sysdig': 1.10,
-          'other': 1.05,
-          'none': 1.0
-        };
-        let vendorWeight = 1.0;
-        cnappCheckboxes.forEach(checkbox => {
-          const weight = vendorWeights[checkbox.value] || 1.0;
-          if (weight > vendorWeight) {
-            vendorWeight = weight;
-          }
-        });
-        
-        // Apply weighted formula
-        marketValueReplaced = baseToolValue * workloads * environmentWeight * vendorWeight;
-        
-        // Display only the estimated value
-        const estimateEl = document.getElementById('consolidationEstimate');
-        estimateEl.classList.add('animating');
-        estimateEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
-        setTimeout(() => estimateEl.classList.remove('animating'), 400);
-        
-        // Add pop-in animation to title only on first show
-        if (!consolidationShownBefore) {
-          const titleEl = document.getElementById('consolidationTitle');
-          titleEl.classList.add('animate-once');
-          consolidationShownBefore = true;
-        }
-        
-        breakdownDiv.classList.remove('calculating');
-        breakdownDiv.classList.add('show');
-        
-        // Update section preview
-        updateSectionPreview('consolidation', marketValueReplaced);
-        
-        // Scroll to the breakdown after a short delay
-        setTimeout(() => {
-          breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-        
-        // Auto-expand next section after calculation
-        setTimeout(() => {
-          const mttrSection = document.getElementById('section-mttr');
-          if (mttrSection && mttrSection.classList.contains('collapsed')) {
-            toggleSection('mttr');
-          }
-        }, 1500);
-        
-        // Update sidebar with delay
-        updateSidebar();
-      }, 800);
-    }
-    
-    function openPreciseEstimate() {
-      redirectToDemo();
-    }
-    
-    function redirectToDemo() {
-      alert('Redirect to book a demo page will be here');
-      // Future: window.location.href = 'https://your-demo-booking-url.com';
-    }
-    
-    function toggleAdditionalDetails() {
-      const toggle = document.getElementById('additionalDetailsToggle');
-      const content = document.getElementById('additionalDetailsContent');
-      
-      toggle.classList.toggle('active');
-      content.classList.toggle('show');
-    }
-    
-    function calculateMTTRSavings() {
-      const workloads = parseInt(workloadsMTTR.value) || 0;
-      const hourlyRate = parseFloat(document.getElementById('hourlyRateMTTR').value) || 35;
-      const monthlyIncidentsValue = parseInt(monthlyIncidents.value) || 0;
-      
-      if (workloads === 0) return;
-      
-      // Show spinner
-      const spinner = document.getElementById('mttrSpinner');
-      spinner.classList.add('show');
-      
-      // Delay calculation for suspense (0.8 seconds)
-      setTimeout(() => {
-        // Hide spinner
-        spinner.classList.remove('show');
-        
-        // Calculate annual incidents from monthly
-        const annualIncidents = monthlyIncidentsValue * 12;
-        
-        // Calculate current time spent (benchmark MTTR)
-        const currentTotalHours = annualIncidents * BENCHMARK_MTTR_HOURS;
-        const currentCost = currentTotalHours * hourlyRate;
-        
-        // Calculate Sweet time spent (optimized MTTR)
-        const sweetTotalHours = annualIncidents * SWEET_MTTR_HOURS;
-        const sweetCost = sweetTotalHours * hourlyRate;
-        
-        // Calculate time saved
-        const hoursSaved = currentTotalHours - sweetTotalHours;
-        
-        // Calculate savings
-        mttrSavings = currentCost - sweetCost;
-        
-        // Build calculation breakdown HTML
-        const stepsHTML = `
-          <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
-            <span class="calc-number">${monthlyIncidentsValue.toLocaleString()}</span>
-            <span class="calc-label">incidents/mo</span>
-            <span class="calc-operator">×</span>
-            <span class="calc-number">12</span>
-            <span class="calc-operator">=</span>
-            <span class="calc-number">${annualIncidents.toLocaleString()}</span>
-            <span class="calc-label">incidents/year</span>
-          </div>
-          <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
-            <span class="calc-number">${hoursSaved.toLocaleString()}</span>
-            <span class="calc-label">hrs saved</span>
-            <span class="calc-operator">×</span>
-            <span class="calc-number">$${hourlyRate}</span>
-            <span class="calc-label">/hr</span>
-          </div>
-          <div style="font-size: 13px; color: var(--muted); margin-bottom: 8px;">MTTR: 3h → 5min per incident</div>
-        `;
-        
-        document.getElementById('mttrCalculationSteps').innerHTML = stepsHTML;
-        
-        // Display the final value
-        const estimateEl = document.getElementById('mttrEstimateValue');
-        estimateEl.classList.add('animating');
-        estimateEl.textContent = `$${Math.round(mttrSavings).toLocaleString()}`;
-        setTimeout(() => estimateEl.classList.remove('animating'), 400);
-        
-        // Show breakdown
-        const breakdownDiv = document.getElementById('mttrBreakdown');
-        breakdownDiv.classList.add('show');
-        
-        // Add pop-in animation to title only on first show
-        if (!mttrShownBefore) {
-          const titleEl = document.getElementById('mttrTitle');
-          titleEl.classList.add('animate-once');
-          mttrShownBefore = true;
-        }
-        
-        // Update section preview
-        updateSectionPreview('mttr', mttrSavings);
-        
-        // Update sidebar
-        updateSidebar();
-        
-        // Scroll to the breakdown
-        setTimeout(() => {
-          breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-        
-        // Auto-expand next section after calculation
-        setTimeout(() => {
-          const vulnSection = document.getElementById('section-vuln');
-          if (vulnSection && vulnSection.classList.contains('collapsed')) {
-            toggleSection('vuln');
-          }
-        }, 1500);
-      }, 800);
-    }
-    
-    function updateEstimatedVulns() {
-      const workloads = parseInt(document.getElementById('workloadsVuln').value) || 0;
-      const estimated = Math.round(workloads * VULNS_PER_WORKLOAD);
-      document.getElementById('vulnEstimated').value = estimated;
-    }
-    
-    function toggleManualVulnEdit() {
-      const vulnEstimatedInput = document.getElementById('vulnEstimated');
-      const btn = document.getElementById('manualEditBtn');
-      
-      if (vulnEstimatedInput.hasAttribute('readonly')) {
-        vulnEstimatedInput.removeAttribute('readonly');
-        vulnEstimatedInput.style.background = 'white';
-        vulnEstimatedInput.focus();
-        btn.textContent = 'Lock';
-        btn.classList.add('editing');
-      } else {
-        vulnEstimatedInput.setAttribute('readonly', 'readonly');
-        vulnEstimatedInput.style.background = '#f5f5f5';
-        btn.textContent = 'Enter manually';
-        btn.classList.remove('editing');
-      }
-    }
-    
-    // Track if vulnerability breakdown has been shown before
-    let vulnShownBefore = false;
-    
-    function calculateVulnSavings() {
-      const vulnsBefore = parseInt(document.getElementById('vulnEstimated').value) || 0;
-      if (vulnsBefore === 0) return;
-      
-      // Show spinner
-      const spinner = document.getElementById('vulnSpinner');
-      const breakdownDiv = document.getElementById('vulnBreakdown');
-      spinner.classList.add('show');
-      breakdownDiv.classList.add('calculating');
-      
-      // Delay calculation for suspense (0.8 seconds)
-      setTimeout(() => {
-        // Hide spinner
-        spinner.classList.remove('show');
-        
-        // Formula: Savings = vulnsBefore × 0.99684 × 10 × 100
-        vulnSavings = vulnsBefore * VULN_REDUCTION_RATE * HOURS_PER_VULN * ENGINEER_HOURLY_COST;
-        
-        // Display only the estimated value
-        const estimateEl = document.getElementById('vulnEstimate');
-        estimateEl.classList.add('animating');
-        estimateEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
-        setTimeout(() => estimateEl.classList.remove('animating'), 400);
-        
-        // Add pop-in animation to title only on first show
-        if (!vulnShownBefore) {
-          const titleEl = document.getElementById('vulnTitle');
-          titleEl.classList.add('animate-once');
-          vulnShownBefore = true;
-        }
-        
-        breakdownDiv.classList.remove('calculating');
-        breakdownDiv.classList.add('show');
-        
-        // Update section preview
-        updateSectionPreview('vuln', vulnSavings);
-        
-        // Scroll to the breakdown after a short delay
-        setTimeout(() => {
-          breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-        
-        // Update sidebar
-        updateSidebar();
-      }, 800);
-    }
-    
-    function updateSidebar() {
-      // Update consolidation item
-      if (marketValueReplaced > 0) {
-        document.getElementById('consolidationItem').style.display = 'flex';
-        const consolidationValueEl = document.getElementById('consolidationValue');
-        consolidationValueEl.classList.add('animating');
-        consolidationValueEl.textContent = `$${marketValueReplaced.toLocaleString()}`;
-        setTimeout(() => consolidationValueEl.classList.remove('animating'), 400);
-        document.getElementById('consolidationDesc').textContent = `Estimated savings from ${selectedTools.size} tools`;
-        
-        // Clean summary - no detailed breakdown
-        document.getElementById('consolidationCalc').innerHTML = '';
-      } else {
-        document.getElementById('consolidationItem').style.display = 'none';
-      }
-      
-      // Update MTTR item
-      if (mttrSavings > 0) {
-        document.getElementById('mttrItem').style.display = 'flex';
-        const mttrValueEl = document.getElementById('mttrValue');
-        mttrValueEl.classList.add('animating');
-        mttrValueEl.textContent = `$${Math.round(mttrSavings).toLocaleString()}`;
-        setTimeout(() => mttrValueEl.classList.remove('animating'), 400);
-        
-        const workloads = parseInt(workloadsMTTR.value) || 0;
-        const hourlyRate = parseFloat(document.getElementById('hourlyRateMTTR').value) || 35;
-        const monthlyIncidentsValue = parseInt(monthlyIncidents.value) || 0;
-        
-        const annualIncidents = monthlyIncidentsValue * 12;
-        const currentHours = Math.round(annualIncidents * BENCHMARK_MTTR_HOURS);
-        const sweetHours = Math.round(annualIncidents * SWEET_MTTR_HOURS);
-        const hoursSaved = currentHours - sweetHours;
-        
-        document.getElementById('mttrDesc').textContent = `${hoursSaved.toLocaleString()} hours saved annually`;
-        
-        document.getElementById('mttrCalc').innerHTML = `
-          <div class="bill-calc-row">
-            <span class="bill-calc-label">MTTR improvement:</span>
-            <span class="bill-calc-value">3 hrs → 5 min</span>
-          </div>
-          <div class="bill-calc-row">
-            <span class="bill-calc-label">Hours saved:</span>
-            <span class="bill-calc-value">${hoursSaved.toLocaleString()} hrs</span>
-          </div>
-          <div class="bill-calc-formula">@ $${hourlyRate}/hour</div>
-        `;
-      } else {
-        document.getElementById('mttrItem').style.display = 'none';
-      }
-      
-      // Update vulnerability item
-      if (vulnSavings > 0) {
-        document.getElementById('vulnItem').style.display = 'flex';
-        const vulnValueEl = document.getElementById('vulnValue');
-        vulnValueEl.classList.add('animating');
-        vulnValueEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
-        setTimeout(() => vulnValueEl.classList.remove('animating'), 400);
-        
-        const vulnsBefore = parseInt(document.getElementById('vulnEstimated').value) || 0;
-        document.getElementById('vulnDesc').textContent = `${Math.round(vulnsBefore * VULN_REDUCTION_RATE).toLocaleString()} vulnerabilities deprioritized`;
-        
-        // Add calculation breakdown
-        document.getElementById('vulnCalc').innerHTML = `
-          <div class="bill-calc-row">
-            <span class="bill-calc-label">Reduction rate:</span>
-            <span class="bill-calc-value">99.684%</span>
-          </div>
-          <div class="bill-calc-row">
-            <span class="bill-calc-label">Time saved:</span>
-            <span class="bill-calc-value">${Math.round(vulnSavings / ENGINEER_HOURLY_COST).toLocaleString()} hrs</span>
-          </div>
-          <div class="bill-calc-formula">@ $${ENGINEER_HOURLY_COST}/hour</div>
-        `;
-      } else {
-        document.getElementById('vulnItem').style.display = 'none';
-      }
-      
-      // Update total with animation
-      const total = marketValueReplaced + mttrSavings + vulnSavings;
-      const totalEl = document.getElementById('totalSavings');
-      totalEl.classList.add('animating');
-      totalEl.textContent = `$${Math.round(total).toLocaleString()}`;
-      setTimeout(() => totalEl.classList.remove('animating'), 400);
-    }
-    
-    // Initialize
-    syncWorkloads(workloadsInput.value);
-    updateMonthlyIncidents();
-  </script>
+  <!-- External JavaScript (ES6 Module) -->
+  <script type="module" src="calculator.js"></script>
 </body>
 </html>
