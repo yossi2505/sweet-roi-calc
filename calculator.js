@@ -383,8 +383,8 @@ function calculateVulnSavings() {
     // Calculate all values
     const vulnsIgnored = Math.round(vulnsBefore * VULN_CONFIG.VULN_REDUCTION_RATE);
     const vulnsCritical = vulnsBefore - vulnsIgnored;
-    const savedEffort = vulnsIgnored * VULN_CONFIG.HOURS_PER_VULN * VULN_CONFIG.ENGINEER_HOURLY_COST;
-    vulnSavings = savedEffort;
+    const hoursSaved = Math.round(vulnsIgnored * VULN_CONFIG.HOURS_PER_VULN);
+    vulnSavings = vulnsIgnored * VULN_CONFIG.HOURS_PER_VULN * VULN_CONFIG.ENGINEER_HOURLY_COST;
     
     // Display main estimated value
     const estimateEl = document.getElementById('vulnEstimate');
@@ -392,12 +392,10 @@ function calculateVulnSavings() {
     estimateEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
     setTimeout(() => estimateEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
     
-    // Populate visual flow with animated numbers
-    animateNumber('vulnTotal', vulnsBefore);
-    animateNumber('vulnIgnored', vulnsIgnored);
-    animateNumber('vulnCritical', vulnsCritical);
-    document.getElementById('vulnIgnoredCost').textContent = vulnsIgnored.toLocaleString();
-    animateCurrency('vulnSavedEffort', savedEffort);
+    // Populate inline explanation with animated numbers
+    animateNumber('vulnFrom', vulnsBefore);
+    animateNumber('vulnTo', vulnsCritical);
+    animateNumber('vulnHoursSaved', hoursSaved);
     
     // Add pop-in animation to title only on first show
     if (!vulnShownBefore) {

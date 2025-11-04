@@ -274,54 +274,19 @@
           
           <!-- Results Breakdown -->
           <div class="calculation-breakdown" id="vulnBreakdown">
-            <!-- Main Result -->
             <div class="breakdown-title" id="vulnTitle">
               <span class="title-emphasis">Estimated savings</span>
             </div>
             <div class="estimated-value" id="vulnEstimate">$0</div>
             
-            <!-- Visual Calculation Flow -->
-            <div class="vuln-calc-flow" id="vulnCalcFlow">
-              <div class="flow-step">
-                <span class="flow-number" id="vulnTotal">0</span>
-                <span class="flow-label">estimated vulnerabilities</span>
-              </div>
-              
-              <div class="flow-operator">×</div>
-              
-              <div class="flow-step">
-                <span class="flow-number">99.6%</span>
-                <span class="flow-label">auto-deprioritized</span>
-              </div>
-              
-              <div class="flow-operator">=</div>
-              
-              <div class="flow-step highlight">
-                <span class="flow-number" id="vulnIgnored">0</span>
-                <span class="flow-label">vulnerabilities you can safely ignore</span>
-              </div>
-              
-              <div class="flow-divider"></div>
-              
-              <div class="flow-result">
-                <span class="flow-arrow">→</span>
-                <span class="flow-number critical" id="vulnCritical">0</span>
-                <span class="flow-label">truly critical vulnerabilities remain</span>
-              </div>
-              
-              <div class="flow-divider"></div>
-              
-              <div class="flow-cost">
-                <span class="flow-number" id="vulnIgnoredCost">0</span>
-                <span class="flow-label">vulnerabilities × 10h × $100/hr = </span>
-                <strong class="flow-number" id="vulnSavedEffort">$0</strong>
-                <span class="flow-label"> saved effort</span>
-              </div>
-            </div>
-            
-            <!-- Summary -->
-            <div class="vuln-summary">
-              Sweet helps you eliminate remediation work for ~99% of vulnerabilities — focusing only on the few that truly matter.
+            <!-- Simple Inline Explanation -->
+            <div class="vuln-inline-explanation">
+              Based on customer benchmarks, we estimate Sweet can reduce your vulnerabilities from 
+              <strong class="vuln-highlight" id="vulnFrom">0</strong> to 
+              <strong class="vuln-highlight-green" id="vulnTo">0</strong> 
+              (<strong>99.6%</strong> reduction), potentially saving 
+              <strong class="vuln-highlight-green" id="vulnHoursSaved">0</strong> hours 
+              that would take SecOps teams to remediate.
             </div>
             
             <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Want a more precise estimation?</button>
