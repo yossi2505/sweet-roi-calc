@@ -34,10 +34,7 @@ export const VULN_CONFIG = {
 // =========================
 // Tool Consolidation Weights
 // =========================
-export const CONSOLIDATION_CONFIG = {
-  // Base rate per workload for consolidation savings
-  BASE_RATE_PER_WORKLOAD: 50,
-  
+export const CONSOLIDATION_WEIGHTS = {
   // Cloud environment weights
   environment: {
     'aws': 1.15,
@@ -49,20 +46,16 @@ export const CONSOLIDATION_CONFIG = {
     'default': 1.0
   },
   
-  // CNAPP vendor coefficients (scales savings based on vendor pricing/complexity)
-  // Formula: workloads × vendorCoefficient × BASE_RATE_PER_WORKLOAD
-  // Results: ~100 workloads = $30K-$50K, ~2000 workloads = $200K-$500K
+  // CNAPP vendor weights (highest single vendor applies, not cumulative)
   vendor: {
-    'wiz': 50,           // Premium tier - highest savings potential
-    'orca': 45,          // High tier
-    'prisma': 40,        // High tier
-    'crowdstrike': 35,   // Mid-high tier
-    'lacework': 30,      // Mid tier
-    'sysdig': 30,        // Mid tier
-    'trend': 25,         // Mid tier
-    'aqua': 25,          // Mid tier
-    'other': 20,         // Lower tier
-    'none': 0            // No CNAPP = no consolidation savings
+    'wiz': 1.25,
+    'orca': 1.20,
+    'prisma': 1.15,
+    'lacework': 1.10,
+    'sysdig': 1.10,
+    'other': 1.05,
+    'none': 1.0,
+    'default': 1.0
   }
 };
 
@@ -142,7 +135,7 @@ export const UI_CONFIG = {
 export default {
   MTTR_CONFIG,
   VULN_CONFIG,
-  CONSOLIDATION_CONFIG,
+  CONSOLIDATION_WEIGHTS,
   SECURITY_TOOLS,
   UI_CONFIG
 };
