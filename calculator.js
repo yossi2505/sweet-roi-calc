@@ -278,7 +278,7 @@ function calculateMTTRSavings() {
       <div style="font-size: 14px; color: var(--muted); line-height: 1.6; text-align: center;">
         Reducing MTTR from <strong style="color: var(--ink);">3 hours to 5 minutes</strong> across 
         <strong style="color: var(--ink);">${annualIncidents.toLocaleString()} annual incidents</strong> 
-        saves <strong style="color: var(--sweet-neon);">${hoursSaved.toLocaleString()} hours</strong> 
+        saves <strong style="color: var(--ink);">${hoursSaved.toLocaleString()} hours</strong> 
         @ $${hourlyRate}/hr.
       </div>
     `;
