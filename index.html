@@ -124,10 +124,47 @@
         <div class="section-content">
         
           <!-- Security Tools Selection -->
-          <div class="input-group">
-            <label class="input-label">Which security products are you currently using?</label>
-            <div class="helper-text">Enter product types separated by commas (e.g., Runtime, CSPM, VM)</div>
-            <input type="text" id="securityTools" class="input" placeholder="Runtime, CWPP, CSPM, IAM, CIEM, DSPM, API Sec, VM, CDR, AI Sec" oninput="updateConsolidationButton()">
+          <label class="input-label">Select the security tools you currently use:</label>
+          <div class="tools-grid" id="toolsGrid">
+            <div class="tool-card" data-tool="Runtime Security" data-price="150">
+              <div class="tool-name">Runtime Security</div>
+              <div class="tool-desc">CWPP & Real-Time Monitoring</div>
+            </div>
+            
+            <div class="tool-card" data-tool="CSPM" data-price="100">
+              <div class="tool-name">Cloud Security Posture</div>
+              <div class="tool-desc">CSPM & Configuration Management</div>
+            </div>
+            
+            <div class="tool-card" data-tool="CIEM" data-price="80">
+              <div class="tool-name">Identity Management</div>
+              <div class="tool-desc">CIEM & Identity Protection</div>
+            </div>
+            
+            <div class="tool-card" data-tool="DSPM" data-price="120">
+              <div class="tool-name">Data Security</div>
+              <div class="tool-desc">DSPM & Data Protection</div>
+            </div>
+            
+            <div class="tool-card" data-tool="API" data-price="110">
+              <div class="tool-name">API Security</div>
+              <div class="tool-desc">API Discovery & Protection</div>
+            </div>
+            
+            <div class="tool-card" data-tool="VM" data-price="90">
+              <div class="tool-name">Vulnerability Management</div>
+              <div class="tool-desc">VM & Prioritization</div>
+            </div>
+            
+            <div class="tool-card" data-tool="CDR" data-price="130">
+              <div class="tool-name">Detection & Response</div>
+              <div class="tool-desc">CDR & SIEM Integration</div>
+            </div>
+            
+            <div class="tool-card" data-tool="AI" data-price="140">
+              <div class="tool-name">AI/ML Security</div>
+              <div class="tool-desc">Model & Pipeline Protection</div>
+            </div>
           </div>
           
           <!-- Calculate Button -->

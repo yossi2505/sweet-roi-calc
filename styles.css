@@ -149,8 +149,8 @@ body {
 }
 
 .section h2 {
-  font-family: 'Inter', serif;
-  font-size: 22px;
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
   font-weight: 700;
   margin: 0 0 8px;
   color: var(--ink);
