@@ -221,14 +221,6 @@ function calculateConsolidation() {
       breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, UI_CONFIG.SCROLL_DELAY);
     
-    // Auto-expand next section after calculation
-    setTimeout(() => {
-      const mttrSection = document.getElementById('section-mttr');
-      if (mttrSection && mttrSection.classList.contains('collapsed')) {
-        toggleSection('mttr');
-      }
-    }, UI_CONFIG.NEXT_SECTION_DELAY);
-    
     // Update sidebar with delay
     updateSidebar();
   }, UI_CONFIG.CALCULATION_DELAY);
@@ -325,14 +317,6 @@ function calculateMTTRSavings() {
     setTimeout(() => {
       breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, UI_CONFIG.SCROLL_DELAY);
-    
-    // Auto-expand next section after calculation
-    setTimeout(() => {
-      const vulnSection = document.getElementById('section-vuln');
-      if (vulnSection && vulnSection.classList.contains('collapsed')) {
-        toggleSection('vuln');
-      }
-    }, UI_CONFIG.NEXT_SECTION_DELAY);
   }, UI_CONFIG.CALCULATION_DELAY);
 }
 
@@ -556,14 +540,6 @@ function initializeEventListeners() {
   // Workload input sync
   workloadsInput.addEventListener('input', () => {
     syncWorkloads(workloadsInput.value);
-    
-    // Auto-expand consolidation section when user starts filling details
-    const consolidationSection = document.getElementById('section-consolidation');
-    if (consolidationSection && consolidationSection.classList.contains('collapsed') && workloadsInput.value) {
-      setTimeout(() => {
-        toggleSection('consolidation');
-      }, 800);
-    }
   });
   
   workloadsMTTR.addEventListener('input', () => {
