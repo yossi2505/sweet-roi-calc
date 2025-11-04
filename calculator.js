@@ -798,33 +798,36 @@ function downloadPDF() {
     }
     
     .bill-total {
-      background: #c2ff00;
-      padding: 24px;
-      border-radius: 8px;
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
       margin-top: 20px;
+      border-top: 2px solid #444;
+      border-bottom: 2px solid #444;
+    }
+    
+    .bill-total-left {
+      display: flex;
+      flex-direction: column;
     }
     
     .total-label {
-      font-family: 'Playfair Display', serif;
+      font-weight: 700;
       font-size: 18px;
-      font-weight: 600;
-      color: #1a1a1a;
-      margin-bottom: 8px;
-    }
-    
-    .total-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 42px;
-      font-weight: 900;
-      color: #1a1a1a;
+      color: white;
       margin-bottom: 4px;
     }
     
     .total-period {
-      font-size: 14px;
-      color: #1a1a1a;
-      opacity: 0.7;
+      font-size: 13px;
+      color: #999;
+    }
+    
+    .total-value {
+      font-weight: 700;
+      font-size: 28px;
+      color: #c2ff00;
     }
     
     .print-footer {
