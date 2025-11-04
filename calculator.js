@@ -60,10 +60,14 @@ function toggleSection(sectionId) {
   // Expand clicked section
   section.classList.remove('collapsed');
   
-  // Scroll to section
+  // Smooth scroll to section after animation starts
   setTimeout(() => {
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+    const yOffset = -20; // 20px offset from top
+    const element = section;
+    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }, 150);
 }
 
 /**
@@ -218,7 +222,9 @@ function calculateConsolidation() {
     
     // Scroll to the breakdown after a short delay
     setTimeout(() => {
-      breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const yOffset = -100;
+      const y = breakdownDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }, UI_CONFIG.SCROLL_DELAY);
     
     // Update sidebar with delay
@@ -315,7 +321,9 @@ function calculateMTTRSavings() {
     
     // Scroll to the breakdown
     setTimeout(() => {
-      breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const yOffset = -100;
+      const y = breakdownDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }, UI_CONFIG.SCROLL_DELAY);
   }, UI_CONFIG.CALCULATION_DELAY);
 }
@@ -397,7 +405,9 @@ function calculateVulnSavings() {
     
     // Scroll to the breakdown after a short delay
     setTimeout(() => {
-      breakdownDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const yOffset = -100;
+      const y = breakdownDiv.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }, UI_CONFIG.SCROLL_DELAY);
     
     // Update sidebar
