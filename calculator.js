@@ -380,15 +380,24 @@ function calculateVulnSavings() {
     // Hide spinner
     spinner.classList.remove('show');
     
-    // Formula: Savings = vulnsBefore × reduction rate × hours per vuln × hourly cost
-    vulnSavings = vulnsBefore * VULN_CONFIG.VULN_REDUCTION_RATE * 
-                  VULN_CONFIG.HOURS_PER_VULN * VULN_CONFIG.ENGINEER_HOURLY_COST;
+    // Calculate all values
+    const vulnsIgnored = Math.round(vulnsBefore * VULN_CONFIG.VULN_REDUCTION_RATE);
+    const vulnsCritical = vulnsBefore - vulnsIgnored;
+    const savedEffort = vulnsIgnored * VULN_CONFIG.HOURS_PER_VULN * VULN_CONFIG.ENGINEER_HOURLY_COST;
+    vulnSavings = savedEffort;
     
-    // Display only the estimated value
+    // Display main estimated value
     const estimateEl = document.getElementById('vulnEstimate');
     estimateEl.classList.add('animating');
     estimateEl.textContent = `$${Math.round(vulnSavings).toLocaleString()}`;
     setTimeout(() => estimateEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
+    
+    // Populate visual flow with animated numbers
+    animateNumber('vulnTotal', vulnsBefore);
+    animateNumber('vulnIgnored', vulnsIgnored);
+    animateNumber('vulnCritical', vulnsCritical);
+    document.getElementById('vulnIgnoredCost').textContent = vulnsIgnored.toLocaleString();
+    animateCurrency('vulnSavedEffort', savedEffort);
     
     // Add pop-in animation to title only on first show
     if (!vulnShownBefore) {
@@ -507,6 +516,66 @@ function updateSidebar() {
   totalEl.classList.add('animating');
   totalEl.textContent = `$${Math.round(total).toLocaleString()}`;
   setTimeout(() => totalEl.classList.remove('animating'), UI_CONFIG.ANIMATION_DURATION);
+}
+
+// =========================
+// Animation Helpers
+// =========================
+
+/**
+ * Animate a number counting up
+ */
+function animateNumber(elementId, finalValue, duration = 800) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+  
+  const startValue = 0;
+  const startTime = performance.now();
+  
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Ease out cubic
+    const easeProgress = 1 - Math.pow(1 - progress, 3);
+    const currentValue = Math.round(startValue + (finalValue - startValue) * easeProgress);
+    
+    element.textContent = currentValue.toLocaleString();
+    
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+  
+  requestAnimationFrame(update);
+}
+
+/**
+ * Animate currency counting up
+ */
+function animateCurrency(elementId, finalValue, duration = 800) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+  
+  const startValue = 0;
+  const startTime = performance.now();
+  
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Ease out cubic
+    const easeProgress = 1 - Math.pow(1 - progress, 3);
+    const currentValue = Math.round(startValue + (finalValue - startValue) * easeProgress);
+    
+    element.textContent = '$' + currentValue.toLocaleString();
+    
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+  
+  requestAnimationFrame(update);
 }
 
 // =========================

@@ -243,7 +243,7 @@
         <div class="section-header" onclick="toggleSection('vuln')">
           <div class="section-header-left">
             <h2>Vulnerability Prioritization ROI</h2>
-            <p>Estimate the savings gained by focusing only on truly critical vulnerabilities.</p>
+            <p>Estimate your potential savings by focusing only on vulnerabilities that truly matter.</p>
           </div>
           <div class="section-header-right">
             <span class="section-result-preview" id="preview-vuln"></span>
@@ -266,12 +266,6 @@
             </div>
           </div>
           
-          <!-- Assumptions -->
-          <div style="padding: 12px 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px;">
-            <strong style="font-size: 14px; color: var(--ink);">Assumptions:</strong>
-            <span style="font-size: 14px; color: var(--muted);"> 10h per vulnerability × $100/hr × 99.684% reduction rate. (based on customer benchmarks)</span>
-          </div>
-          
           <!-- Calculate Button -->
           <button class="calculate-btn" id="vulnBtn" onclick="calculateVulnSavings()">Calculate Vulnerability Savings</button>
           
@@ -280,12 +274,57 @@
           
           <!-- Results Breakdown -->
           <div class="calculation-breakdown" id="vulnBreakdown">
+            <!-- Main Result -->
             <div class="breakdown-title" id="vulnTitle">
               <span class="title-emphasis">Estimated savings</span>
-              <span class="title-subtext">from intelligent vulnerability prioritization.</span>
             </div>
             <div class="estimated-value" id="vulnEstimate">$0</div>
-            <button class="cta-button precision-cta" onclick="openPreciseEstimate()">Want a more precise estimation?</button>
+            
+            <!-- Visual Calculation Flow -->
+            <div class="vuln-calc-flow" id="vulnCalcFlow">
+              <div class="flow-step">
+                <span class="flow-number" id="vulnTotal">0</span>
+                <span class="flow-label">estimated vulnerabilities</span>
+              </div>
+              
+              <div class="flow-operator">×</div>
+              
+              <div class="flow-step">
+                <span class="flow-number">99.6%</span>
+                <span class="flow-label">auto-deprioritized</span>
+              </div>
+              
+              <div class="flow-operator">=</div>
+              
+              <div class="flow-step highlight">
+                <span class="flow-number" id="vulnIgnored">0</span>
+                <span class="flow-label">vulnerabilities you can safely ignore</span>
+              </div>
+              
+              <div class="flow-divider"></div>
+              
+              <div class="flow-result">
+                <span class="flow-arrow">→</span>
+                <span class="flow-number critical" id="vulnCritical">0</span>
+                <span class="flow-label">truly critical vulnerabilities remain</span>
+              </div>
+              
+              <div class="flow-divider"></div>
+              
+              <div class="flow-cost">
+                <span class="flow-number" id="vulnIgnoredCost">0</span>
+                <span class="flow-label">vulnerabilities × 10h × $100/hr = </span>
+                <strong class="flow-number" id="vulnSavedEffort">$0</strong>
+                <span class="flow-label"> saved effort</span>
+              </div>
+            </div>
+            
+            <!-- Summary -->
+            <div class="vuln-summary">
+              Sweet helps you eliminate remediation work for ~99% of vulnerabilities — focusing only on the few that truly matter.
+            </div>
+            
+            <button class="cta-button precision-cta" onclick="openPreciseEstimate()" style="margin-top: 20px;">Want a more precise estimation?</button>
           </div>
         </div>
       </div>
