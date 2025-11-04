@@ -513,9 +513,9 @@ function updateSidebar() {
   
   // Show download button if at least one calculation is done
   const downloadBtn = document.getElementById('downloadReportBtn');
-  if (total > 0) {
+  if (downloadBtn && total > 0) {
     downloadBtn.style.display = 'flex';
-  } else {
+  } else if (downloadBtn) {
     downloadBtn.style.display = 'none';
   }
 }
@@ -650,12 +650,23 @@ function initializeEventListeners() {
 // =========================
 
 /**
- * Download ROI report as PDF
+ * Download ROI report as PDF (uses current dark design, stays on page)
  */
 function downloadPDF() {
-  // Create a clean HTML document for the PDF
-  const workloads = parseInt(document.getElementById('workloads').value) || 0;
-  const totalSavings = marketValueReplaced + mttrSavings + vulnSavings;
+  // Clone the sidebar to get all current content
+  const sidebar = document.querySelector('.sidebar').cloneNode(true);
+  
+  // Remove the download button from clone
+  const downloadBtn = sidebar.querySelector('.download-icon-btn');
+  if (downloadBtn) {
+    downloadBtn.remove();
+  }
+  
+  // Remove the CTA button from clone
+  const ctaBtn = sidebar.querySelector('.cta-button');
+  if (ctaBtn) {
+    ctaBtn.remove();
+  }
   
   // Get current date
   const date = new Date().toLocaleDateString('en-US', { 
@@ -664,189 +675,123 @@ function downloadPDF() {
     day: 'numeric' 
   });
   
-  // Build PDF content
-  let pdfContent = `
+  const workloads = parseInt(document.getElementById('workloads').value) || 0;
+  
+  // Get all current styles
+  const styles = Array.from(document.styleSheets)
+    .map(styleSheet => {
+      try {
+        return Array.from(styleSheet.cssRules)
+          .map(rule => rule.cssText)
+          .join('\n');
+      } catch (e) {
+        return '';
+      }
+    })
+    .join('\n');
+  
+  // Build PDF HTML with current dark design
+  const pdfContent = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <title>Sweet Security ROI Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: 'Inter', -apple-system, sans-serif; 
-      padding: 40px; 
-      max-width: 800px; 
-      margin: 0 auto;
-      color: #1a1a1a;
-      line-height: 1.6;
+    ${styles}
+    
+    body {
+      background: white;
+      padding: 40px;
+      margin: 0;
     }
-    .header { 
-      text-align: center; 
-      margin-bottom: 40px; 
-      padding-bottom: 30px;
-      border-bottom: 3px solid #c2ff00;
-    }
-    .header h1 { 
-      font-size: 32px; 
-      margin-bottom: 8px; 
-      color: #1a1a1a;
-    }
-    .header .subtitle { 
-      font-size: 16px; 
-      color: #666; 
-    }
-    .date { 
-      text-align: right; 
-      color: #888; 
-      font-size: 14px; 
-      margin-bottom: 30px;
-    }
-    .summary-box {
-      background: #fafffe;
-      border: 2px solid #c2ff00;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 30px;
+    
+    .print-header {
       text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #c2ff00;
     }
-    .summary-box .label {
-      font-size: 18px;
-      color: #666;
-      margin-bottom: 8px;
-    }
-    .summary-box .total {
-      font-size: 48px;
-      font-weight: 700;
+    
+    .print-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
       color: #1a1a1a;
-      margin-bottom: 4px;
+      margin: 0 0 8px 0;
     }
-    .summary-box .period {
-      font-size: 16px;
+    
+    .print-date {
+      text-align: right;
       color: #888;
-    }
-    .breakdown {
-      margin-top: 30px;
-    }
-    .breakdown h2 {
-      font-size: 20px;
+      font-size: 13px;
       margin-bottom: 20px;
-      color: #1a1a1a;
     }
-    .breakdown-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid #e5e5e5;
-    }
-    .breakdown-item:last-child {
-      border-bottom: none;
-    }
-    .breakdown-item .name {
-      font-weight: 600;
-      font-size: 16px;
-    }
-    .breakdown-item .desc {
-      font-size: 14px;
-      color: #666;
-      margin-top: 4px;
-    }
-    .breakdown-item .value {
-      font-weight: 700;
-      font-size: 18px;
-      color: #1a1a1a;
-    }
-    .footer {
-      margin-top: 50px;
-      padding-top: 30px;
+    
+    .print-footer {
+      margin-top: 30px;
+      padding-top: 20px;
       border-top: 1px solid #e5e5e5;
       text-align: center;
-      color: #888;
-      font-size: 14px;
+      font-size: 13px;
+      color: #666;
     }
-    .footer strong {
-      color: #1a1a1a;
+    
+    .sidebar {
+      position: static !important;
+      max-width: 600px;
+      margin: 0 auto;
     }
+    
     @media print {
       body { padding: 20px; }
+      @page { margin: 1cm; }
     }
   </style>
 </head>
 <body>
-  <div class="header">
+  <div class="print-header">
     <h1>Sweet Security ROI Report</h1>
-    <div class="subtitle">Estimated Annual Savings Analysis</div>
   </div>
   
-  <div class="date">Generated: ${date}</div>
+  <div class="print-date">Generated: ${date}</div>
   
-  <div class="summary-box">
-    <div class="label">Total Annual Value</div>
-    <div class="total">$${totalSavings.toLocaleString()}</div>
-    <div class="period">per year</div>
-  </div>
+  ${sidebar.outerHTML}
   
-  <div class="breakdown">
-    <h2>Savings Breakdown</h2>
-`;
-
-  // Add breakdown items if they exist
-  if (marketValueReplaced > 0) {
-    pdfContent += `
-    <div class="breakdown-item">
-      <div>
-        <div class="name">Tool Consolidation</div>
-        <div class="desc">Estimated annual savings from consolidating security tools</div>
-      </div>
-      <div class="value">$${marketValueReplaced.toLocaleString()}</div>
-    </div>
-`;
-  }
-  
-  if (mttrSavings > 0) {
-    pdfContent += `
-    <div class="breakdown-item">
-      <div>
-        <div class="name">MTTR Reduction</div>
-        <div class="desc">Savings from reducing incident response time</div>
-      </div>
-      <div class="value">$${mttrSavings.toLocaleString()}</div>
-    </div>
-`;
-  }
-  
-  if (vulnSavings > 0) {
-    pdfContent += `
-    <div class="breakdown-item">
-      <div>
-        <div class="name">Vulnerability Prioritization</div>
-        <div class="desc">Savings from automated vulnerability management</div>
-      </div>
-      <div class="value">$${vulnSavings.toLocaleString()}</div>
-    </div>
-`;
-  }
-  
-  pdfContent += `
-  </div>
-  
-  <div class="footer">
+  <div class="print-footer">
     <p><strong>Organization Size:</strong> ${workloads.toLocaleString()} workloads</p>
-    <p style="margin-top: 20px;">This report is generated by Sweet Security's ROI Calculator based on your inputs and industry benchmarks.</p>
+    <p style="margin-top: 12px;">This report is generated by Sweet Security's ROI Calculator.</p>
   </div>
 </body>
 </html>
 `;
 
-  // Open print dialog with the PDF content
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(pdfContent);
-  printWindow.document.close();
+  // Create hidden iframe for printing
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = 'none';
+  document.body.appendChild(iframe);
   
-  // Wait for content to load, then trigger print
-  setTimeout(() => {
-    printWindow.print();
-  }, 250);
+  // Write content and trigger print
+  const iframeDoc = iframe.contentWindow.document;
+  iframeDoc.open();
+  iframeDoc.write(pdfContent);
+  iframeDoc.close();
+  
+  // Wait for content to load, then print and cleanup
+  iframe.contentWindow.onload = function() {
+    setTimeout(() => {
+      iframe.contentWindow.print();
+      // Remove iframe after printing (or if user cancels)
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 250);
+  };
 }
 
 // =========================
