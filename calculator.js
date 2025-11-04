@@ -119,21 +119,21 @@ function syncWorkloads(sourceValue) {
  * Initialize tool card click handlers
  */
 function initializeToolSelection() {
-  document.querySelectorAll('.tool-card').forEach(card => {
-    card.addEventListener('click', function() {
-      const tool = this.dataset.tool;
-      
-      if (selectedTools.has(tool)) {
-        selectedTools.delete(tool);
-        this.classList.remove('selected');
-      } else {
-        selectedTools.add(tool);
-        this.classList.add('selected');
-      }
-      
-      updateConsolidationButton();
-    });
+document.querySelectorAll('.tool-card').forEach(card => {
+  card.addEventListener('click', function() {
+    const tool = this.dataset.tool;
+    
+    if (selectedTools.has(tool)) {
+      selectedTools.delete(tool);
+      this.classList.remove('selected');
+    } else {
+      selectedTools.add(tool);
+      this.classList.add('selected');
+    }
+    
+    updateConsolidationButton();
   });
+});
 }
 
 /**
@@ -690,7 +690,7 @@ function downloadPDF() {
     })
     .join('\n');
   
-  // Build PDF HTML with current dark design
+  // Build professional PDF HTML with print-friendly colors
   const pdfContent = `
 <!DOCTYPE html>
 <html>
@@ -699,68 +699,188 @@ function downloadPDF() {
   <title>Sweet Security ROI Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    ${styles}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
-      background: white;
+      background: #f8f8f8;
       padding: 40px;
       margin: 0;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #1a1a1a;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    
+    .print-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 50px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border-radius: 12px;
     }
     
     .print-header {
       text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #c2ff00;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 3px solid #c2ff00;
     }
     
     .print-header h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 32px;
+      font-size: 36px;
       color: #1a1a1a;
       margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+    
+    .print-header .subtitle {
+      font-size: 16px;
+      color: #666;
+      font-weight: 400;
     }
     
     .print-date {
       text-align: right;
       color: #888;
       font-size: 13px;
+      margin-bottom: 30px;
+    }
+    
+    .roi-summary {
+      background: #1a1a1a;
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    
+    .roi-summary h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: white;
+    }
+    
+    .bill-items {
       margin-bottom: 20px;
     }
     
-    .print-footer {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #e5e5e5;
-      text-align: center;
-      font-size: 13px;
-      color: #666;
+    .bill-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid #333;
     }
     
-    .sidebar {
-      position: static !important;
-      max-width: 600px;
-      margin: 0 auto;
+    .bill-item:last-child {
+      border-bottom: none;
+    }
+    
+    .bill-item-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: white;
+      margin-bottom: 4px;
+    }
+    
+    .bill-item-desc {
+      font-size: 13px;
+      color: #999;
+    }
+    
+    .bill-item-value {
+      font-weight: 700;
+      font-size: 18px;
+      color: #c2ff00;
+    }
+    
+    .bill-total {
+      background: #c2ff00;
+      padding: 24px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .total-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    
+    .total-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 900;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    
+    .total-period {
+      font-size: 14px;
+      color: #1a1a1a;
+      opacity: 0.7;
+    }
+    
+    .print-footer {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 2px solid #e5e5e5;
+      text-align: center;
+    }
+    
+    .print-footer p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .print-footer strong {
+      color: #1a1a1a;
+      font-weight: 600;
     }
     
     @media print {
-      body { padding: 20px; }
-      @page { margin: 1cm; }
+      body { 
+        padding: 0; 
+        background: white;
+      }
+      .print-container { 
+        box-shadow: none; 
+        padding: 30px;
+      }
+      @page { 
+        margin: 1.5cm;
+        size: A4;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="print-header">
-    <h1>Sweet Security ROI Report</h1>
-  </div>
-  
-  <div class="print-date">Generated: ${date}</div>
-  
-  ${sidebar.outerHTML}
-  
-  <div class="print-footer">
-    <p><strong>Organization Size:</strong> ${workloads.toLocaleString()} workloads</p>
-    <p style="margin-top: 12px;">This report is generated by Sweet Security's ROI Calculator.</p>
+  <div class="print-container">
+    <div class="print-header">
+      <h1>Sweet Security ROI Report</h1>
+      <div class="subtitle">Annual Savings Analysis</div>
+    </div>
+    
+    <div class="print-date">Generated: ${date}</div>
+    
+    <div class="roi-summary">
+      <h3>Your ROI Summary</h3>
+      ${sidebar.querySelector('.bill-items').outerHTML}
+      ${sidebar.querySelector('.bill-total').outerHTML}
+    </div>
+    
+    <div class="print-footer">
+      <p><strong>Organization Size:</strong> ${workloads.toLocaleString()} workloads</p>
+      <p style="margin-top: 16px;">This report is generated by Sweet Security's ROI Calculator based on your inputs and industry benchmarks. Results are estimates and may vary based on your specific environment and usage.</p>
+      <p style="margin-top: 16px; font-size: 13px; color: #999;">© ${new Date().getFullYear()} Sweet Security. All rights reserved.</p>
+    </div>
   </div>
 </body>
 </html>
