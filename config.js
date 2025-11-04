@@ -32,7 +32,7 @@ export const VULN_CONFIG = {
 };
 
 // =========================
-// Tool Consolidation Weights
+// Tool Consolidation Configuration
 // =========================
 export const CONSOLIDATION_WEIGHTS = {
   // Cloud environment weights
@@ -58,6 +58,21 @@ export const CONSOLIDATION_WEIGHTS = {
     'default': 1.0
   }
 };
+
+// CNAPP vendor costs (cost per workload per year)
+export const CNAPP_VENDOR_COSTS = {
+  'wiz': 90,
+  'orca': 80,
+  'prisma': 100,
+  'lacework': 70,
+  'sysdig': 85,
+  'upwind': 75,
+  'other': 85,
+  'none': 0
+};
+
+// Sweet Security cost per workload per year
+export const SWEET_COST_PER_WORKLOAD = 55;
 
 // =========================
 // Tool Catalog
@@ -136,6 +151,8 @@ export default {
   MTTR_CONFIG,
   VULN_CONFIG,
   CONSOLIDATION_WEIGHTS,
+  CNAPP_VENDOR_COSTS,
+  SWEET_COST_PER_WORKLOAD,
   SECURITY_TOOLS,
   UI_CONFIG
 };

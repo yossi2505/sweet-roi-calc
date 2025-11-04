@@ -6,7 +6,9 @@
 import { 
   MTTR_CONFIG, 
   VULN_CONFIG, 
-  CONSOLIDATION_WEIGHTS, 
+  CONSOLIDATION_WEIGHTS,
+  CNAPP_VENDOR_COSTS,
+  SWEET_COST_PER_WORKLOAD,
   UI_CONFIG 
 } from './config.js';
 
@@ -112,28 +114,54 @@ function syncWorkloads(sourceValue) {
 }
 
 // =========================
-// Tool Selection
+// Tool Selection & CNAPP Flow
 // =========================
+
+/**
+ * Toggle between tools flow and CNAPP flow
+ */
+function toggleCNAPPFlow() {
+  const hasCNAPP = document.querySelector('input[name="hasCNAPP"]:checked').value;
+  const toolsFlow = document.getElementById('toolsFlow');
+  const cnappFlow = document.getElementById('cnappFlow');
+  
+  if (hasCNAPP === 'yes') {
+    toolsFlow.style.display = 'none';
+    cnappFlow.style.display = 'block';
+    // Clear tool selections
+    selectedTools.clear();
+    document.querySelectorAll('.tool-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+  } else {
+    toolsFlow.style.display = 'block';
+    cnappFlow.style.display = 'none';
+    // Clear vendor selection
+    document.getElementById('cnappVendor').value = '';
+  }
+  
+  updateConsolidationButton();
+}
 
 /**
  * Initialize tool card click handlers
  */
 function initializeToolSelection() {
-document.querySelectorAll('.tool-card').forEach(card => {
-  card.addEventListener('click', function() {
-    const tool = this.dataset.tool;
-    
-    if (selectedTools.has(tool)) {
-      selectedTools.delete(tool);
-      this.classList.remove('selected');
-    } else {
-      selectedTools.add(tool);
-      this.classList.add('selected');
-    }
-    
-    updateConsolidationButton();
+  document.querySelectorAll('.tool-card').forEach(card => {
+    card.addEventListener('click', function() {
+      const tool = this.dataset.tool;
+      
+      if (selectedTools.has(tool)) {
+        selectedTools.delete(tool);
+        this.classList.remove('selected');
+      } else {
+        selectedTools.add(tool);
+        this.classList.add('selected');
+      }
+      
+      updateConsolidationButton();
+    });
   });
-});
 }
 
 /**
@@ -142,27 +170,40 @@ document.querySelectorAll('.tool-card').forEach(card => {
 function updateConsolidationButton() {
   const btn = document.getElementById('consolidationBtn');
   const workloads = parseInt(workloadsInput.value) || 0;
+  const hasCNAPP = document.querySelector('input[name="hasCNAPP"]:checked').value;
   
-  if (selectedTools.size > 0 && workloads > 0) {
-    btn.disabled = false;
-    btn.textContent = 'Calculate';
+  let canCalculate = false;
+  
+  if (hasCNAPP === 'no') {
+    // Need tools selected and workloads
+    canCalculate = selectedTools.size > 0 && workloads > 0;
+    btn.textContent = canCalculate ? 'Calculate Estimated Savings' : 'Select tools and enter workloads';
   } else {
-    btn.disabled = true;
-    btn.textContent = 'Select tools and enter workloads';
+    // Need vendor selected and workloads
+    const vendor = document.getElementById('cnappVendor').value;
+    canCalculate = vendor && workloads > 0;
+    btn.textContent = canCalculate ? 'Calculate Estimated Savings' : 'Select vendor and enter workloads';
   }
+  
+  btn.disabled = !canCalculate;
 }
+
+// Make function globally accessible
+window.toggleCNAPPFlow = toggleCNAPPFlow;
 
 // =========================
 // Tool Consolidation Calculator
 // =========================
 
 /**
- * Calculate tool consolidation ROI using weighted formula
+ * Calculate tool consolidation ROI
+ * Supports two flows: CNAPP replacement or multi-tool consolidation
  */
 function calculateConsolidation() {
   const workloads = parseInt(workloadsInput.value) || 0;
+  const hasCNAPP = document.querySelector('input[name="hasCNAPP"]:checked').value;
   
-  if (selectedTools.size === 0 || workloads === 0) return;
+  if (workloads === 0) return;
   
   // Add calculating state and show spinner
   const breakdownDiv = document.getElementById('consolidationBreakdown');
@@ -175,32 +216,45 @@ function calculateConsolidation() {
     // Hide spinner
     spinner.classList.remove('show');
     
-    // Calculate base tool value (sum of data-price attributes)
-    let baseToolValue = 0;
-    selectedTools.forEach(tool => {
-      const card = document.querySelector(`[data-tool="${tool}"]`);
-      const price = parseInt(card.dataset.price);
-      baseToolValue += price;
-    });
-    
-    // Get environment weight
-    const cloudEnvironment = document.getElementById('cloudEnvironment').value;
-    const environmentWeight = CONSOLIDATION_WEIGHTS.environment[cloudEnvironment] || 
-                             CONSOLIDATION_WEIGHTS.environment.default;
-    
-    // Get vendor weight (highest single vendor, not cumulative)
-    const cnappCheckboxes = document.querySelectorAll('input[name="cnappTools"]:checked');
-    let vendorWeight = CONSOLIDATION_WEIGHTS.vendor.default;
-    cnappCheckboxes.forEach(checkbox => {
-      const weight = CONSOLIDATION_WEIGHTS.vendor[checkbox.value] || 
-                    CONSOLIDATION_WEIGHTS.vendor.default;
-      if (weight > vendorWeight) {
-        vendorWeight = weight;
-      }
-    });
-    
-    // Apply weighted formula
-    marketValueReplaced = baseToolValue * workloads * environmentWeight * vendorWeight;
+    // Two calculation paths based on CNAPP selection
+    if (hasCNAPP === 'yes') {
+      // CNAPP Replacement Flow: (vendor cost - Sweet cost) × workloads
+      const vendor = document.getElementById('cnappVendor').value;
+      const vendorCost = CNAPP_VENDOR_COSTS[vendor] || 0;
+      const savingPerWorkload = vendorCost - SWEET_COST_PER_WORKLOAD;
+      marketValueReplaced = Math.max(savingPerWorkload * workloads, 0);
+      
+    } else {
+      // Multi-Tool Consolidation Flow: Original weighted formula
+      if (selectedTools.size === 0) return;
+      
+      // Calculate base tool value (sum of data-price attributes)
+      let baseToolValue = 0;
+      selectedTools.forEach(tool => {
+        const card = document.querySelector(`[data-tool="${tool}"]`);
+        const price = parseInt(card.dataset.price);
+        baseToolValue += price;
+      });
+      
+      // Get environment weight
+      const cloudEnvironment = document.getElementById('cloudEnvironment').value;
+      const environmentWeight = CONSOLIDATION_WEIGHTS.environment[cloudEnvironment] || 
+                               CONSOLIDATION_WEIGHTS.environment.default;
+      
+      // Get vendor weight (highest single vendor, not cumulative)
+      const cnappCheckboxes = document.querySelectorAll('input[name="cnappTools"]:checked');
+      let vendorWeight = CONSOLIDATION_WEIGHTS.vendor.default;
+      cnappCheckboxes.forEach(checkbox => {
+        const weight = CONSOLIDATION_WEIGHTS.vendor[checkbox.value] || 
+                      CONSOLIDATION_WEIGHTS.vendor.default;
+        if (weight > vendorWeight) {
+          vendorWeight = weight;
+        }
+      });
+      
+      // Apply weighted formula
+      marketValueReplaced = baseToolValue * workloads * environmentWeight * vendorWeight;
+    }
     
     // Display only the estimated value
     const estimateEl = document.getElementById('consolidationEstimate');

@@ -123,47 +123,83 @@
         </div>
         <div class="section-content">
         
-          <!-- Security Tools Selection -->
-          <label class="input-label">Select the security tools you currently use:</label>
-          <div class="tools-grid" id="toolsGrid">
-            <div class="tool-card" data-tool="Runtime" data-price="150">
-              <div class="tool-name">Runtime</div>
+          <!-- CNAPP Question -->
+          <div class="input-group">
+            <label class="input-label">Do you have an existing CNAPP solution?</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="hasCNAPP" value="no" onchange="toggleCNAPPFlow()" checked>
+                <span>No</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="hasCNAPP" value="yes" onchange="toggleCNAPPFlow()">
+                <span>Yes</span>
+              </label>
             </div>
-            
-            <div class="tool-card" data-tool="CWPP" data-price="150">
-              <div class="tool-name">CWPP</div>
+          </div>
+          
+          <!-- Flow A: No CNAPP - Security Tools Selection -->
+          <div id="toolsFlow">
+            <label class="input-label">Select the security tools you currently use:</label>
+            <div class="tools-grid" id="toolsGrid">
+              <div class="tool-card" data-tool="Runtime" data-price="150">
+                <div class="tool-name">Runtime</div>
+              </div>
+              
+              <div class="tool-card" data-tool="CWPP" data-price="150">
+                <div class="tool-name">CWPP</div>
+              </div>
+              
+              <div class="tool-card" data-tool="CSPM" data-price="100">
+                <div class="tool-name">CSPM</div>
+              </div>
+              
+              <div class="tool-card" data-tool="IAM" data-price="80">
+                <div class="tool-name">IAM</div>
+              </div>
+              
+              <div class="tool-card" data-tool="CIEM" data-price="80">
+                <div class="tool-name">CIEM</div>
+              </div>
+              
+              <div class="tool-card" data-tool="DSPM" data-price="120">
+                <div class="tool-name">DSPM</div>
+              </div>
+              
+              <div class="tool-card" data-tool="API Sec" data-price="110">
+                <div class="tool-name">API Sec</div>
+              </div>
+              
+              <div class="tool-card" data-tool="VM" data-price="90">
+                <div class="tool-name">VM</div>
+              </div>
+              
+              <div class="tool-card" data-tool="CDR" data-price="130">
+                <div class="tool-name">CDR</div>
+              </div>
+              
+              <div class="tool-card" data-tool="AI Sec" data-price="140">
+                <div class="tool-name">AI Sec</div>
+              </div>
             </div>
-            
-            <div class="tool-card" data-tool="CSPM" data-price="100">
-              <div class="tool-name">CSPM</div>
-            </div>
-            
-            <div class="tool-card" data-tool="IAM" data-price="80">
-              <div class="tool-name">IAM</div>
-            </div>
-            
-            <div class="tool-card" data-tool="CIEM" data-price="80">
-              <div class="tool-name">CIEM</div>
-            </div>
-            
-            <div class="tool-card" data-tool="DSPM" data-price="120">
-              <div class="tool-name">DSPM</div>
-            </div>
-            
-            <div class="tool-card" data-tool="API Sec" data-price="110">
-              <div class="tool-name">API Sec</div>
-            </div>
-            
-            <div class="tool-card" data-tool="VM" data-price="90">
-              <div class="tool-name">VM</div>
-            </div>
-            
-            <div class="tool-card" data-tool="CDR" data-price="130">
-              <div class="tool-name">CDR</div>
-            </div>
-            
-            <div class="tool-card" data-tool="AI Sec" data-price="140">
-              <div class="tool-name">AI Sec</div>
+          </div>
+          
+          <!-- Flow B: Yes CNAPP - Vendor Selection -->
+          <div id="cnappFlow" style="display: none;">
+            <div class="input-group">
+              <label class="input-label">Which CNAPP vendor are you currently using?</label>
+              <div class="helper-text">This helps us estimate the consolidation value more accurately.</div>
+              <select id="cnappVendor" class="input" onchange="updateConsolidationButton()">
+                <option value="">Select vendor...</option>
+                <option value="wiz">Wiz</option>
+                <option value="orca">Orca Security</option>
+                <option value="prisma">Prisma Cloud</option>
+                <option value="lacework">Lacework</option>
+                <option value="sysdig">Sysdig</option>
+                <option value="upwind">Upwind</option>
+                <option value="other">Other</option>
+                <option value="none">None</option>
+              </select>
             </div>
           </div>
           
