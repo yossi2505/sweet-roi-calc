@@ -147,21 +147,21 @@ function toggleCNAPPFlow() {
  * Initialize tool card click handlers
  */
 function initializeToolSelection() {
-  document.querySelectorAll('.tool-card').forEach(card => {
-    card.addEventListener('click', function() {
-      const tool = this.dataset.tool;
-      
-      if (selectedTools.has(tool)) {
-        selectedTools.delete(tool);
-        this.classList.remove('selected');
-      } else {
-        selectedTools.add(tool);
-        this.classList.add('selected');
-      }
-      
-      updateConsolidationButton();
-    });
+document.querySelectorAll('.tool-card').forEach(card => {
+  card.addEventListener('click', function() {
+    const tool = this.dataset.tool;
+    
+    if (selectedTools.has(tool)) {
+      selectedTools.delete(tool);
+      this.classList.remove('selected');
+    } else {
+      selectedTools.add(tool);
+      this.classList.add('selected');
+    }
+    
+    updateConsolidationButton();
   });
+});
 }
 
 /**
@@ -227,33 +227,22 @@ function calculateConsolidation() {
     } else {
       // Multi-Tool Consolidation Flow: Original weighted formula
       if (selectedTools.size === 0) return;
-      
-      // Calculate base tool value (sum of data-price attributes)
-      let baseToolValue = 0;
-      selectedTools.forEach(tool => {
-        const card = document.querySelector(`[data-tool="${tool}"]`);
-        const price = parseInt(card.dataset.price);
-        baseToolValue += price;
-      });
-      
-      // Get environment weight
-      const cloudEnvironment = document.getElementById('cloudEnvironment').value;
+    
+    // Calculate base tool value (sum of data-price attributes)
+    let baseToolValue = 0;
+    selectedTools.forEach(tool => {
+      const card = document.querySelector(`[data-tool="${tool}"]`);
+      const price = parseInt(card.dataset.price);
+      baseToolValue += price;
+    });
+    
+    // Get environment weight
+    const cloudEnvironment = document.getElementById('cloudEnvironment').value;
       const environmentWeight = CONSOLIDATION_WEIGHTS.environment[cloudEnvironment] || 
                                CONSOLIDATION_WEIGHTS.environment.default;
       
-      // Get vendor weight (highest single vendor, not cumulative)
-      const cnappCheckboxes = document.querySelectorAll('input[name="cnappTools"]:checked');
-      let vendorWeight = CONSOLIDATION_WEIGHTS.vendor.default;
-      cnappCheckboxes.forEach(checkbox => {
-        const weight = CONSOLIDATION_WEIGHTS.vendor[checkbox.value] || 
-                      CONSOLIDATION_WEIGHTS.vendor.default;
-        if (weight > vendorWeight) {
-          vendorWeight = weight;
-        }
-      });
-      
-      // Apply weighted formula
-      marketValueReplaced = baseToolValue * workloads * environmentWeight * vendorWeight;
+      // Apply weighted formula (without vendor weight since CNAPP moved to Yes flow)
+      marketValueReplaced = baseToolValue * workloads * environmentWeight;
     }
     
     // Display only the estimated value
